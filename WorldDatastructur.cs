@@ -1,0 +1,488 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WorldReader
+{
+    class WorldDatastructur
+    {
+        // File Header
+        private byte[] fileHeader;
+
+        // General File Information
+        private string WorldName;
+        private Int32 WidthTiles;
+        private Int32 HeightTiles;
+        private Int32 TileSetWidth;
+        private Int32 TileSetHeight;
+
+        private Dictionary<string, TileMapGroup> tileMapGroups = null;
+
+        private class TileMapGroup
+        {
+
+            public List<Tile> tiles = null;
+            public List<MapObject> mapObjects = null;
+            // Non visible Information
+            public List<Properties> properties = null;
+            public List<LineSegment> lineSegments = null;
+
+            public TileMapGroup()
+            {
+                this.tiles = new List<Tile>();
+                this.mapObjects = new List<MapObject>();
+                this.properties = new List<Properties>();
+                this.lineSegments = new List<LineSegment>();
+            }
+
+            public class Tile
+            {
+                public Int32 PropertyIndex2 = Int32.MaxValue;
+
+                public bool IsPropertyIndex2Set
+                {
+                    get { return PropertyIndex2 != Int32.MaxValue; }
+                    private set { }
+                }
+
+                public CollisionTile collisionTile = null;
+
+                public AppearanceTile appearanceTile = null;
+
+                public class CollisionTile
+                {
+                    public UInt32 CollisionFlag;
+                    public Int32 LineSegmentIndex3 = Int32.MaxValue; // uninitialized 
+
+                    public bool IsLineSegmentIndex3Set { 
+                        get { return LineSegmentIndex3 != Int32.MaxValue; }
+                        private set { }
+                    }
+                }
+
+                public class AppearanceTile
+                {
+                    public enum RenderLayer {
+                        PrePreFG = 1,
+                        PreFG = 2,
+                        PreFGWater = 3,
+                        FG = 4,
+                        BGProps = 8,
+                        BG = 9,
+                        BGWater = 10
+                    }
+                    public Dictionary<RenderLayer, UInt32> TileAppearanceIndex = null;
+
+                    public AppearanceTile()
+                    {
+                        this.TileAppearanceIndex = new Dictionary<RenderLayer, UInt32>();
+                    }
+                }
+
+                public Tile()
+                {
+                    this.collisionTile = new CollisionTile();
+                    this.appearanceTile = new AppearanceTile();
+                }
+            }
+
+            public class MapObject
+            {
+                public string mapObjectGroupName;
+                public UInt32 mapObjectGroupType;
+                public string name;
+                public UInt32 id;
+                public Single boundsPixelX;
+                public Single boundsPixelY;
+                public Single boundsPixelWidth;
+                public Single boundsPixelHeight;
+                public bool flipH;
+                public bool flipV;
+                public Single rotation;
+                public List<Tuple<Single,Single>> vertices = null;
+                public Dictionary<string, string> valuePairs = null;
+
+                public MapObject()
+                {
+                    this.vertices = new List<Tuple<Single, Single>>();
+                    this.valuePairs = new Dictionary<string, string>();
+                }
+            }
+
+            public class Properties
+            {
+                public UInt32 mapObjectGroupType;
+                public Dictionary<string, string> valuePairs = null;
+                public Properties()
+                {
+                    this.valuePairs = new Dictionary<string, string>();
+                }
+            }
+
+            public class LineSegment
+            {
+                public Tuple<Single, Single> point1 = null;
+                public Tuple<Single, Single> point2 = null;
+                public LineSegment(Single p1x, Single p1y, Single p2x, Single p2y)
+                {
+                    this.point1 = new Tuple<Single, Single>(p1x, p1y);
+                    this.point2 = new Tuple<Single, Single>(p2x, p2y);
+                }
+            }
+
+        }
+
+
+        public WorldDatastructur(BinaryReader reader)
+        {
+            this.tileMapGroups = new Dictionary<string, TileMapGroup>();
+
+            // FileHeader
+            fileHeader = reader.ReadBytes(0x5C);
+            reader.ReadInt32(); // File Length
+
+            // Header
+            WorldName = reader.ReadString();
+            WidthTiles = reader.ReadInt32();
+            HeightTiles = reader.ReadInt32();
+            TileSetWidth = reader.ReadInt32();
+            TileSetHeight = reader.ReadInt32();
+            Int32 numberOfNext2 = reader.ReadInt32();
+
+            // TileMapGroups
+            for (int i = 0; i < numberOfNext2; i++) {
+
+                // Header
+                string tileMapGroupName = reader.ReadString();
+                tileMapGroups.Add(tileMapGroupName, new TileMapGroup());
+                for (int j = 0; j < 4; j++)
+                {
+                    reader.ReadInt32(); // Same as global Header
+                }
+
+                // Tile Collision Flag
+                for (int j = 0; j < WidthTiles * HeightTiles; j++)
+                {
+                    TileMapGroup.Tile tempTile = new TileMapGroup.Tile();
+                    tempTile.collisionTile.CollisionFlag = reader.ReadUInt32();
+                    
+                    tileMapGroups[tileMapGroupName].tiles.Add(tempTile);
+                    
+                }
+
+                // Tile Appearance
+                Int32 numberOfNext3 = reader.ReadInt32();
+                for (int j = 0; j < numberOfNext3; j++)
+                {
+                    UInt32 renderLayer = reader.ReadUInt32();
+                    reader.ReadUInt32(); // RenderType always 1/alpha
+                    Int32 numberOfNext = reader.ReadInt32();
+
+                    // Render Tile
+                    for (int k = 0; k < numberOfNext; k++)
+                    {
+                        tileMapGroups[tileMapGroupName].tiles[k].appearanceTile.TileAppearanceIndex.Add((TileMapGroup.Tile.AppearanceTile.RenderLayer)renderLayer, reader.ReadUInt32());
+                    }
+                }
+
+                // MapObjectGroup
+                Int32 numberOfNext4 = reader.ReadInt32();
+                for (int j = 0; j < numberOfNext4; j++)
+                {
+                    string mapObjectGroupName = reader.ReadString();
+                    Int32 numberOfNext = reader.ReadInt32();
+
+                    // MapObject
+                    for (int k = 0; k < numberOfNext; k++)
+                    {
+                        TileMapGroup.MapObject tempMapObject = new TileMapGroup.MapObject();
+                        tempMapObject.mapObjectGroupName = mapObjectGroupName;
+                        tempMapObject.name = reader.ReadString();
+                        tempMapObject.id = reader.ReadUInt32();
+                        tempMapObject.boundsPixelX = reader.ReadSingle();
+                        tempMapObject.boundsPixelY = reader.ReadSingle();
+                        tempMapObject.boundsPixelWidth = reader.ReadSingle();
+                        tempMapObject.boundsPixelHeight = reader.ReadSingle();
+                        tempMapObject.flipH = reader.ReadBoolean();
+                        tempMapObject.flipV = reader.ReadBoolean();
+                        tempMapObject.rotation = reader.ReadSingle();
+                        Int32 numberOfNextVertices = reader.ReadInt32();
+
+                        // Vertices for enemy pathfinding
+                        for (int l = 0; l < numberOfNextVertices; l++)
+                        {
+                            tempMapObject.vertices.Add(new Tuple<Single, Single>(reader.ReadSingle(), reader.ReadSingle()));
+                        }
+
+                        // MapObjectProperties
+                        tempMapObject.mapObjectGroupType = reader.ReadUInt32();
+                        Int32 numberOfNextProperties = reader.ReadInt32();
+                        for (int l = 0; l < numberOfNextProperties; l++)
+                        {
+                            tempMapObject.valuePairs.Add(reader.ReadString(), reader.ReadString());
+                        }
+
+                        tileMapGroups[tileMapGroupName].mapObjects.Add(tempMapObject);
+                    }
+                }
+
+                // PropertiesList
+                Int32 numberOfNext5 = reader.ReadInt32();
+                for (int j = 0; j < numberOfNext5; j++)
+                {
+                    // Properties
+                    TileMapGroup.Properties tempProperties = new TileMapGroup.Properties();
+                    tempProperties.mapObjectGroupType = reader.ReadUInt32();
+                    Int32 numberOfNextProperties = reader.ReadInt32();
+
+                    // Add Key-Values Pairs
+                    for (int k = 0; k < numberOfNextProperties; k++)
+                    {
+                        tempProperties.valuePairs.Add(reader.ReadString(), reader.ReadString());
+                    }
+
+                    tileMapGroups[tileMapGroupName].properties.Add(tempProperties);
+                }
+
+                // TileProperties
+                Int32 numberOfNext6 = reader.ReadInt32();
+                for (int j = 0; j < numberOfNext6; j++)
+                {
+                    tileMapGroups[tileMapGroupName].tiles[reader.ReadInt32()].PropertyIndex2 = reader.ReadInt32();
+                }
+
+                // LineSegmentList
+                Int32 numberOfNext7 = reader.ReadInt32();
+                for (int j = 0; j < numberOfNext7; j++)
+                {
+                    tileMapGroups[tileMapGroupName].lineSegments.Add(new TileMapGroup.LineSegment(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
+                }
+
+                // CollisionTileLineSegment
+                Int32 numberOfNext9 = reader.ReadInt32();
+                for (int j = 0; j < numberOfNext9; j++)
+                {
+                    tileMapGroups[tileMapGroupName].tiles[reader.ReadInt32()].collisionTile.LineSegmentIndex3 = reader.ReadInt32();
+                }
+            }
+        }
+
+        public void Write(BinaryWriter binaryWriter)
+        {
+            // Constants
+            const UInt32 RENDER_TYPE_ALPHA = 1;
+
+            // FileHeader
+            binaryWriter.Write(fileHeader);
+
+            // Header
+            binaryWriter.Write(0); // Length of File // Placeholder inserted after all other
+            binaryWriter.Write(WorldName);
+            binaryWriter.Write(WidthTiles);
+            binaryWriter.Write(HeightTiles);
+            binaryWriter.Write(TileSetWidth);
+            binaryWriter.Write(TileSetHeight);
+            Int32 numberOfNext2 = tileMapGroups.Count();
+            binaryWriter.Write(numberOfNext2);
+
+            // TileMapGroups
+            foreach (KeyValuePair<string, TileMapGroup> tileMapGroup in tileMapGroups)
+            {
+
+                // Header
+                binaryWriter.Write(tileMapGroup.Key);
+                binaryWriter.Write(WidthTiles);
+                binaryWriter.Write(HeightTiles);
+                binaryWriter.Write(TileSetWidth);
+                binaryWriter.Write(TileSetHeight);
+
+                // Tile Collision Flag
+                for (int i = 0; i < WidthTiles * HeightTiles; i++)
+                {
+                    binaryWriter.Write(tileMapGroup.Value.tiles[i].collisionTile.CollisionFlag);
+                }
+
+                // Tile Appearance
+                HashSet<TileMapGroup.Tile.AppearanceTile.RenderLayer> renderLayers = calculateTileAppearanceLength(tileMapGroup.Value);
+                Int32 numberOfNext3 = renderLayers.Count();
+                binaryWriter.Write(numberOfNext3);
+                foreach (TileMapGroup.Tile.AppearanceTile.RenderLayer renderLayer in renderLayers)
+                {
+                    binaryWriter.Write((UInt32)renderLayer);
+                    binaryWriter.Write(RENDER_TYPE_ALPHA);
+                    Int32 numberOfNext = WidthTiles * HeightTiles;
+                    binaryWriter.Write(numberOfNext);
+                    
+                    for (int i = 0; i < numberOfNext; i++)
+                    {
+                        if (!tileMapGroup.Value.tiles[i].appearanceTile.TileAppearanceIndex.ContainsKey(renderLayer)) continue;
+                        UInt32 tileAppearanceIndex = tileMapGroup.Value.tiles[i].appearanceTile.TileAppearanceIndex[renderLayer];
+                        binaryWriter.Write(tileAppearanceIndex);
+                    }
+                }
+
+                // MapObjectGroupList
+                Dictionary<string, Int32> mapObjectLengthDict = calculateMapObjectGroupLength(tileMapGroup.Value);
+                Int32 numberOfNext4 = mapObjectLengthDict.Count();
+                binaryWriter.Write(numberOfNext4);
+                foreach(KeyValuePair<string, Int32> mapObjectGroupLength in mapObjectLengthDict)
+                {
+
+                    // MapObjectGroup
+                    binaryWriter.Write(mapObjectGroupLength.Key);
+                    Int32 numberOfNext = mapObjectGroupLength.Value;
+                    binaryWriter.Write(numberOfNext);
+
+                    foreach(TileMapGroup.MapObject mapObject in tileMapGroup.Value.mapObjects)
+                    {
+
+                        // MapObject
+                        if (mapObject.mapObjectGroupName != mapObjectGroupLength.Key) continue;
+                        binaryWriter.Write(mapObject.name);
+                        binaryWriter.Write(mapObject.id);
+                        binaryWriter.Write(mapObject.boundsPixelX);
+                        binaryWriter.Write(mapObject.boundsPixelY);
+                        binaryWriter.Write(mapObject.boundsPixelWidth);
+                        binaryWriter.Write(mapObject.boundsPixelHeight);
+                        binaryWriter.Write(mapObject.flipH);
+                        binaryWriter.Write(mapObject.flipV);
+                        binaryWriter.Write(mapObject.rotation);
+
+                        // Vertices
+                        Int32 numberOfVertices = mapObject.vertices.Count();
+                        binaryWriter.Write(numberOfVertices);
+                        foreach(Tuple<Single, Single> vertex in mapObject.vertices)
+                        {
+                            binaryWriter.Write(vertex.Item1);
+                            binaryWriter.Write(vertex.Item2);
+                        }
+
+                        // Properties
+                        binaryWriter.Write(mapObject.mapObjectGroupType);
+                        Int32 numberOfValuePairs = mapObject.valuePairs.Count();
+                        binaryWriter.Write(numberOfValuePairs);
+                        foreach(KeyValuePair<string, string> valuePair in mapObject.valuePairs)
+                        {
+                            binaryWriter.Write(valuePair.Key);
+                            binaryWriter.Write(valuePair.Value);
+                        }
+
+                    }
+
+                }
+
+                // PropertiesList
+                Int32 numberOfNext5 = tileMapGroup.Value.properties.Count();
+                binaryWriter.Write(numberOfNext5);
+                foreach (TileMapGroup.Properties property in tileMapGroup.Value.properties)
+                {
+                    binaryWriter.Write(property.mapObjectGroupType);
+                    binaryWriter.Write(property.valuePairs.Count());
+
+                    // Key-Value Pairs
+                    foreach (KeyValuePair<string, string> valuePair in property.valuePairs)
+                    {
+                        binaryWriter.Write(valuePair.Key);
+                        binaryWriter.Write(valuePair.Value);
+                    }
+
+                }
+
+                // TileProperties
+                Int32 numberOfNext6 = calculateTilePropertiesLength(tileMapGroup.Value);
+                binaryWriter.Write(numberOfNext6);
+                for(int i = 0; i < WidthTiles * HeightTiles; i++)
+                {
+                    if (!tileMapGroup.Value.tiles[i].IsPropertyIndex2Set) continue;
+                    binaryWriter.Write(i);
+                    binaryWriter.Write(tileMapGroup.Value.tiles[i].PropertyIndex2);
+                }
+
+                // LineSegmentList
+                Int32 numberOfNext7 = tileMapGroup.Value.lineSegments.Count();
+                binaryWriter.Write(numberOfNext7);
+                foreach(TileMapGroup.LineSegment lineSegment in tileMapGroup.Value.lineSegments)
+                {
+                    binaryWriter.Write(lineSegment.point1.Item1);
+                    binaryWriter.Write(lineSegment.point1.Item2);
+                    binaryWriter.Write(lineSegment.point2.Item1);
+                    binaryWriter.Write(lineSegment.point2.Item2);
+                }
+
+                // CollisionTileLineSegment
+                Int32 numberOfNext9 = calculateCollisionTileLineSegmentLength(tileMapGroup.Value);
+                binaryWriter.Write(numberOfNext9);
+                for (int i = 0; i < WidthTiles * HeightTiles; i++)
+                {
+                    if (!tileMapGroup.Value.tiles[i].collisionTile.IsLineSegmentIndex3Set) continue;
+                    binaryWriter.Write(i);
+                    binaryWriter.Write(tileMapGroup.Value.tiles[i].collisionTile.LineSegmentIndex3);
+                }
+
+            }
+
+            // Set fileLength postpone
+            Int32 fileLength = (Int32)binaryWriter.BaseStream.Length;
+            binaryWriter.Seek(0x5C, SeekOrigin.Begin);
+            binaryWriter.Write(fileLength);
+
+        }
+
+
+
+        // HELPER
+
+        private HashSet<TileMapGroup.Tile.AppearanceTile.RenderLayer> calculateTileAppearanceLength(TileMapGroup tileMapGroup)
+        {
+            HashSet<TileMapGroup.Tile.AppearanceTile.RenderLayer> tempSet = new HashSet<TileMapGroup.Tile.AppearanceTile.RenderLayer>();
+            foreach(TileMapGroup.Tile tile in tileMapGroup.tiles)
+            {
+                foreach(TileMapGroup.Tile.AppearanceTile.RenderLayer renderLayer in tile.appearanceTile.TileAppearanceIndex.Keys)
+                {
+                    tempSet.Add(renderLayer);
+                }
+            }
+            return tempSet;
+        }
+
+        private Dictionary<string, Int32> calculateMapObjectGroupLength(TileMapGroup tileMapGroup)
+        {
+            Dictionary<string, Int32> tempDict = new Dictionary<string, int>();
+            foreach(TileMapGroup.MapObject mapObject in tileMapGroup.mapObjects)
+            {
+                if (tempDict.ContainsKey(mapObject.mapObjectGroupName))
+                {
+                    tempDict[mapObject.mapObjectGroupName]++;
+                }
+                else
+                {
+                    tempDict.Add(mapObject.mapObjectGroupName, 1);
+                }
+            }
+            return tempDict;
+        }
+
+        private Int32 calculateTilePropertiesLength(TileMapGroup tileMapGroup)
+        {
+            Int32 length = 0;
+            foreach(TileMapGroup.Tile tile in tileMapGroup.tiles)
+            {
+                if (tile.IsPropertyIndex2Set) length++;
+            }
+            return length;
+        }
+
+        private Int32 calculateCollisionTileLineSegmentLength(TileMapGroup tileMapGroup)
+        {
+            Int32 length = 0;
+            foreach (TileMapGroup.Tile tile in tileMapGroup.tiles)
+            {
+                if (tile.collisionTile.IsLineSegmentIndex3Set) length++;
+            }
+            return length;
+        }
+    }
+}

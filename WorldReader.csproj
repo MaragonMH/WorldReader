@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="img\Bold.png" />
+    <None Remove="img\Italic.png" />
+    <None Remove="img\Open.png" />
+    <None Remove="img\Save.png" />
+    <None Remove="img\Underline.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="img\Bold.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="img\Italic.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="img\Open.png" />
+    <Resource Include="img\Save.png" />
+    <Resource Include="img\Underline.png" />
+  </ItemGroup>
+
+</Project>
