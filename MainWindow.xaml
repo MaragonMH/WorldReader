@@ -9,39 +9,219 @@
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" Executed="Open_Executed" />
         <CommandBinding Command="ApplicationCommands.Save" Executed="Save_Executed" />
+        <CommandBinding Command="ApplicationCommands.Undo" Executed="Undo_Executed" />
+        <CommandBinding Command="ApplicationCommands.Redo" Executed="Redo_Executed" />
+        <CommandBinding Command="ApplicationCommands.Copy" Executed="Copy_Executed" />
+        <CommandBinding Command="ApplicationCommands.Cut" Executed="Cut_Executed" />
+        <CommandBinding Command="ApplicationCommands.Paste" Executed="Paste_Executed" />
+        <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed" />
     </Window.CommandBindings>
+
     <DockPanel>
-
-
-        <ToolBar DockPanel.Dock="Top">
+        <ToolBar DockPanel.Dock="Top" Background="AliceBlue">
             <Button Command="ApplicationCommands.Open">
-                <Image Source="/img/Open.png" Width="16" Height="16" />
+                <Image Source="pack://application:,,,/img/Open.png" Width="16" Height="16" />
             </Button>
             <Button Command="ApplicationCommands.Save">
-                <Image Source="/img/Save.png" Width="16" Height="16" />
+                <Image Source="pack://application:,,,/img/Save.png" Width="16" Height="16" />
             </Button>
             <Separator />
-            <ComboBox Height="16" Width="160" IsEditable="True" IsReadOnly="True" Text="-- Select TileMapGroup --">
-                <TextBlock Text="Outside" />
-                <TextBlock Text="Inside" />
-                <TextBlock Text="Breach" />
+            <Button Command="ApplicationCommands.Undo">
+                <Image Source="pack://application:,,,/img/Undo.png" Width="16" Height="16" />
+            </Button>
+            <Button Command="ApplicationCommands.Redo">
+                <Image Source="pack://application:,,,/img/Redo.png" Width="16" Height="16" />
+            </Button>
+            <Separator />
+            <Button Command="ApplicationCommands.Copy">
+                <Image Source="pack://application:,,,/img/Copy.png" Width="16" Height="16" />
+            </Button>
+            <Button Command="ApplicationCommands.Cut">
+                <Image Source="pack://application:,,,/img/Cut.png" Width="16" Height="16" />
+            </Button>
+            <Button Command="ApplicationCommands.Paste">
+                <Image Source="pack://application:,,,/img/Paste.png" Width="16" Height="16" />
+            </Button>
+            <Separator/>
+            <Button Click="ZoomToFit">
+                <Image Source="pack://application:,,,/img/ZoomToFit.png" Width="16" Height="16" />
+            </Button>
+            <Separator/>
+            <ComboBox Name="TileMapGroups" Height="16" Width="160" IsEditable="True" IsReadOnly="True" Text="-- Open a File --" SelectedValuePath="Content">
+                <!--Fill dynamically in WorldManager-->
             </ComboBox>
+            <Separator/>
             <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File">
-                    <MenuItem Command="New" />
-                    <Separator />
-                    <MenuItem Header="_Exit" />
-                </MenuItem>
-                <MenuItem Header="_Edit">
-                    <CheckBox Content="First Checkbox" />
-                    <CheckBox Content="Second Checkbox" />
-                    <CheckBox Content="Third Checkbox" />
-                    <MenuItem Command="Cut" />
-                    <MenuItem Command="Copy" />
-                    <MenuItem Command="Paste" />
+                <MenuItem Name="Layers" Header="Layers">
+                    <!--Fill dynamically in WorldManager-->
                 </MenuItem>
             </Menu>
+            <Separator/>
+            <Button Command="ApplicationCommands.New">New</Button>
         </ToolBar>
-        <Canvas />
+
+        <Grid DockPanel.Dock="Left" Width="Auto" Background="AliceBlue">
+            <TextBlock Text="Property-Explorer" HorizontalAlignment="Stretch" Background="{x:Static SystemColors.WindowFrameBrush}" VerticalAlignment="Stretch" Foreground="White" TextAlignment="Center" Padding="0, 5, 0, 5"/>
+
+            <TreeView Name ="TreeMenu" Width="Auto" Background="AliceBlue" BorderThickness="0" Padding="0, 10, 10, 0">
+                <TreeViewItem Name="TileCollision" Header="Tile Collision" IsSelected="True" Visibility="Visible" IsExpanded="False">
+                    <StackPanel Orientation="Horizontal" >
+                        <Label MinWidth="150" Content="Properties: "/>
+                        <ComboBox Name="PropertyIndex2" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a property set--" MinWidth="200" SelectedValuePath="Content">
+                            <!--Fill dynamically in WorldManager-->
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Collision Set: "/>
+                        <ComboBox Name="LineSegementIndex3" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a collision set --" MinWidth="200" SelectedValuePath="Content">
+                            <!--Fill dynamically in WorldManager-->
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Collision Flags: "/>
+                        <TextBox Name="CollisionFlag" Text="0" Height="auto" Width="auto" VerticalContentAlignment="Center"  IsReadOnly="True" MinWidth="200"/>
+                    </StackPanel>
+                    <CheckBox Name="FlagFlipHorizontally" Content="Flag: Flip Horizontally"/>
+                    <CheckBox Name="FlagFlipVertically" Content="Flag: Flip Vertically"/>
+                    <CheckBox Name="FlagGlitchable" Content="Flag: Glitchable"/>
+                    <CheckBox Name="FlagTriggerable" Content="Flag: Triggerable"/>
+                    <CheckBox Name="FlagDamageable" Content="Flag: Damageable"/>
+                    <CheckBox Name="FlagUnclimbable" Content="Flag: Unclimbable"/>
+                    <CheckBox Name="FlagDamageableFringe" Content="Flag: Damageable Fringe"/>
+                    <CheckBox Name="FlagCastsShadow" Content="Flag: Casts Shadow"/>
+                    <CheckBox Name="FlagHandlesDamageAsNPC" Content="Flag: Handles Damage As NPC"/>
+                    <CheckBox Name="FlagLedge" Content="Flag: Ledge"/>
+                    <CheckBox Name="FlagStair" Content="Flag: Stair"/>
+                    <CheckBox Name="FlagChainDestructs" Content="Flag: Chain Destructs"/>
+                    <CheckBox Name="FlagField" Content="Flag: Field"/>
+                    <CheckBox Name="FlagSurface" Content="Flag: Surface"/>
+                    <CheckBox Name="FlagAlternateRender" Content="Flag: Alternate Render"/>
+                    <CheckBox Name="FlagCollision" Content="Flag: Collision"/>
+                    <CheckBox Name="FlagHidden" Content="Flag: Hidden"/>
+                    <CheckBox Name="FlagEmptyTile" Content="Flag: Empty Tile"/>
+                    <CheckBox Name="FlagNone" Content="Flag: None"/>
+                </TreeViewItem>
+
+                <TreeViewItem Name="TileAppearance" Header="Tile Appearance" IsSelected="True" Visibility="Visible" IsExpanded="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="PrePreFG: "/>
+                        <TextBox Name="PrePreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="PreFG: "/>
+                        <TextBox Name="PreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="PreFGWater: "/>
+                        <TextBox Name="PreFGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="FG: "/>
+                        <TextBox Name="FG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="BGProps: "/>
+                        <TextBox Name="BGProps" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="BG: "/>
+                        <TextBox Name="BG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="BGWater: "/>
+                        <TextBox Name="BGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                </TreeViewItem>
+
+                <TreeViewItem Name="MapObject" Header="MapObject" IsSelected="True" Visibility="Visible" IsExpanded="False">
+                    <StackPanel Orientation="Horizontal" >
+                        <Label MinWidth="150" Content="Group Type: "/>
+                        <ComboBox Name="MapObjectGroupType" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object category --" MinWidth="200" SelectedValuePath="Content">
+                            <!--Fill dynamically in WorldManager-->
+                        </ComboBox>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Properties: "/>
+                        <ComboBox Name="MapObjectProperties" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object properties set --" MinWidth="200" SelectedValuePath="Content">
+                            <!--Fill dynamically in WorldManager-->
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Enemy Route Vertices: "/>
+                        <ComboBox Name="MapObjectVertices" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object vertices set --" MinWidth="200" SelectedValuePath="Content">
+                            <!--Fill dynamically in WorldManager-->
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Name: "/>
+                        <TextBox Name="MapObjectName" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Id: "/>
+                        <TextBox Name="MapObjectId" Height="auto" Width="auto" IsReadOnly="True" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Position X: "/>
+                        <TextBox Name="MapObjectBoundsPixelX" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Position Y: "/>
+                        <TextBox Name="MapObjectBoundsPixelY" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Width: "/>
+                        <TextBox Name="MapObjectWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Height: "/>
+                        <TextBox Name="MapObjectHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <CheckBox Name="MapObjectFlipHorizontally" Content="Flip Horizontally"/>
+                    <CheckBox Name="MapObjectFlipVertically" Content="Flip Vertically"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Rotation: "/>
+                        <TextBox Name="MapObjectRotation" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                </TreeViewItem>
+
+                <TreeViewItem Name="General" Header="General" IsSelected="True" Visibility="Visible" IsExpanded="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="World Width: "/>
+                        <TextBox Name="WorldWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="World Height:"/>
+                        <TextBox Name="WorldHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Tileset Map Width:"/>
+                        <TextBox Name="TileSetMapWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Tileset Map Height:"/>
+                        <TextBox Name="TileSetMapHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                </TreeViewItem>
+            </TreeView>
+        </Grid>
+
+        <ScrollViewer Name="ScrollContainer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Canvas Name="TileCanvas" Width="Auto" Height="Auto"  UseLayoutRounding="True" RenderOptions.BitmapScalingMode="NearestNeighbor"     
+                    MouseWheel="CanvasMouseWheel"
+                    MouseMove="CanvasMouseMove" 
+                    MouseRightButtonUp="CanvasMouseRightButtonUp" 
+                    MouseRightButtonDown="CanvasMouseRightButtonDown">
+                <Canvas.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform/>
+                        <ScaleTransform/>
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+            </Canvas>
+        </ScrollViewer>
     </DockPanel>
+
 </Window>

@@ -2,28 +2,38 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="img\Bold.png" />
-    <None Remove="img\Italic.png" />
+    <None Remove="img\CollapseLeft.png" />
+    <None Remove="img\Copy.png" />
+    <None Remove="img\Cut.png" />
+    <None Remove="img\ExpandRight.png" />
     <None Remove="img\Open.png" />
+    <None Remove="img\Paste.png" />
+    <None Remove="img\Redo.png" />
     <None Remove="img\Save.png" />
-    <None Remove="img\Underline.png" />
+    <None Remove="img\Undo.png" />
+    <None Remove="img\ZoomToFit.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="img\Bold.png">
+    <Resource Include="img\CollapseLeft.png" />
+    <Resource Include="img\ExpandRight.png" />
+    <Resource Include="img\Redo.png" />
+    <Resource Include="img\Undo.png" />
+    <Resource Include="img\ZoomToFit.png" />
+    <Resource Include="img\Copy.png" />
+    <Resource Include="img\Cut.png" />
+    <Resource Include="img\Open.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="img\Italic.png">
+    <Resource Include="img\Paste.png" />
+    <Resource Include="img\Save.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="img\Open.png" />
-    <Resource Include="img\Save.png" />
-    <Resource Include="img\Underline.png" />
   </ItemGroup>
 
 </Project>

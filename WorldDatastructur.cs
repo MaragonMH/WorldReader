@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -7,21 +8,21 @@ using System.Threading.Tasks;
 
 namespace WorldReader
 {
-    class WorldDatastructur
+    public class WorldDatastructur
     {
         // File Header
-        private byte[] fileHeader;
+        private byte[] fileHeader = null;
 
         // General File Information
         private string WorldName;
-        private Int32 WidthTiles;
-        private Int32 HeightTiles;
+        public Int32 WidthTiles;
+        public Int32 HeightTiles;
         private Int32 TileSetWidth;
         private Int32 TileSetHeight;
 
-        private Dictionary<string, TileMapGroup> tileMapGroups = null;
+        public Dictionary<string, TileMapGroup> tileMapGroups = null;
 
-        private class TileMapGroup
+        public class TileMapGroup
         {
 
             public List<Tile> tiles = null;
@@ -30,12 +31,53 @@ namespace WorldReader
             public List<Properties> properties = null;
             public List<LineSegment> lineSegments = null;
 
+            public enum MapObjectGroupType
+            {
+                ApocalypseUrn,
+                Boss,
+                BreachPortal,
+                Damageable,
+                DamageTrigger,
+                ExteriorDoor,
+                ForceField,
+                Generic,
+                GlitchableTile,
+                GenericRegion,
+                Item,
+                Lattice,
+                NPC,
+                ParticleObject,
+                Room,
+                RoomAction,
+                RoomTransition,
+                PasscodeAction,
+                SavePoint,
+                SecretWorld,
+                SecretWorldEntrance,
+                SecretWorldItem,
+                TileNPC,
+                TriggerRegion,
+                UdugDoor
+            }
+
             public TileMapGroup()
             {
                 this.tiles = new List<Tile>();
                 this.mapObjects = new List<MapObject>();
                 this.properties = new List<Properties>();
                 this.lineSegments = new List<LineSegment>();
+            }
+
+            ~TileMapGroup()
+            {
+                this.tiles.Clear();
+                this.tiles = null;
+                this.mapObjects.Clear();
+                this.mapObjects = null;
+                this.properties.Clear();
+                this.properties = null;
+                this.lineSegments.Clear();
+                this.lineSegments = null;
             }
 
             public class Tile
@@ -80,6 +122,12 @@ namespace WorldReader
                     {
                         this.TileAppearanceIndex = new Dictionary<RenderLayer, UInt32>();
                     }
+
+                    ~AppearanceTile()
+                    {
+                        this.TileAppearanceIndex.Clear();
+                        this.TileAppearanceIndex = null;
+                    }
                 }
 
                 public Tile()
@@ -87,12 +135,18 @@ namespace WorldReader
                     this.collisionTile = new CollisionTile();
                     this.appearanceTile = new AppearanceTile();
                 }
+
+                ~Tile()
+                {
+                    this.collisionTile = null;
+                    this.appearanceTile = null;
+                }
             }
 
             public class MapObject
             {
                 public string mapObjectGroupName;
-                public UInt32 mapObjectGroupType;
+                public MapObjectGroupType mapObjectGroupType;
                 public string name;
                 public UInt32 id;
                 public Single boundsPixelX;
@@ -110,15 +164,60 @@ namespace WorldReader
                     this.vertices = new List<Tuple<Single, Single>>();
                     this.valuePairs = new Dictionary<string, string>();
                 }
+
+                ~MapObject()
+                {
+                    this.vertices.Clear();
+                    this.vertices = null;
+                    this.valuePairs.Clear();
+                    this.valuePairs = null;
+                }
+
+                public string PropertiesToString()
+                {
+                    string result = $"Type: {mapObjectGroupType.ToString()}\n";
+                    foreach (KeyValuePair<string, string> pair in this.valuePairs)
+                    {
+                        result += $"K: {pair.Key}, V: {pair.Value}\n";
+                    }
+                    return result;
+                }
+
+                public string VerticesToString()
+                {
+                    string result = $"";
+                    foreach (Tuple<Single, Single> vertex in this.vertices)
+                    {
+                        result += $"X: {vertex.Item1}, Y: {vertex.Item2}\n"; ;
+                    }
+                    return result;
+                }
             }
 
             public class Properties
             {
-                public UInt32 mapObjectGroupType;
+                
+                public MapObjectGroupType mapObjectGroupType;
                 public Dictionary<string, string> valuePairs = null;
                 public Properties()
                 {
                     this.valuePairs = new Dictionary<string, string>();
+                }
+
+                ~Properties()
+                {
+                    this.valuePairs.Clear();
+                    this.valuePairs = null;
+                }
+
+                public override string ToString()
+                {
+                    string result = $"Type: {mapObjectGroupType.ToString()}\n";
+                    foreach(KeyValuePair<string, string> pair in this.valuePairs)
+                    {
+                        result += $"K: {pair.Key}, V: {pair.Value}\n";
+                    }
+                    return result;
                 }
             }
 
@@ -130,6 +229,18 @@ namespace WorldReader
                 {
                     this.point1 = new Tuple<Single, Single>(p1x, p1y);
                     this.point2 = new Tuple<Single, Single>(p2x, p2y);
+                }
+
+                ~LineSegment()
+                {
+                    this.point1 = null;
+                    this.point2 = null;
+                }
+
+                public override string ToString()
+                {
+                    string result = $"X1: {point1.Item1}, Y1: {point1.Item2}\nX2: {point2.Item1}, Y2: {point2.Item2}";
+                    return result;
                 }
             }
 
@@ -218,7 +329,7 @@ namespace WorldReader
                         }
 
                         // MapObjectProperties
-                        tempMapObject.mapObjectGroupType = reader.ReadUInt32();
+                        tempMapObject.mapObjectGroupType = (TileMapGroup.MapObjectGroupType)reader.ReadUInt32();
                         Int32 numberOfNextProperties = reader.ReadInt32();
                         for (int l = 0; l < numberOfNextProperties; l++)
                         {
@@ -235,7 +346,7 @@ namespace WorldReader
                 {
                     // Properties
                     TileMapGroup.Properties tempProperties = new TileMapGroup.Properties();
-                    tempProperties.mapObjectGroupType = reader.ReadUInt32();
+                    tempProperties.mapObjectGroupType = (TileMapGroup.MapObjectGroupType)reader.ReadUInt32();
                     Int32 numberOfNextProperties = reader.ReadInt32();
 
                     // Add Key-Values Pairs
@@ -268,6 +379,16 @@ namespace WorldReader
                     tileMapGroups[tileMapGroupName].tiles[reader.ReadInt32()].collisionTile.LineSegmentIndex3 = reader.ReadInt32();
                 }
             }
+
+            Debug.WriteLine("WorldDatastructur read");
+        }
+
+        ~WorldDatastructur()
+        {
+            this.fileHeader = null;
+            this.tileMapGroups.Clear();
+            this.tileMapGroups = null;
+            Debug.WriteLine("WorldDatastructur disposed");
         }
 
         public void Write(BinaryWriter binaryWriter)
@@ -361,7 +482,7 @@ namespace WorldReader
                         }
 
                         // Properties
-                        binaryWriter.Write(mapObject.mapObjectGroupType);
+                        binaryWriter.Write((UInt32)mapObject.mapObjectGroupType);
                         Int32 numberOfValuePairs = mapObject.valuePairs.Count();
                         binaryWriter.Write(numberOfValuePairs);
                         foreach(KeyValuePair<string, string> valuePair in mapObject.valuePairs)
@@ -379,7 +500,7 @@ namespace WorldReader
                 binaryWriter.Write(numberOfNext5);
                 foreach (TileMapGroup.Properties property in tileMapGroup.Value.properties)
                 {
-                    binaryWriter.Write(property.mapObjectGroupType);
+                    binaryWriter.Write((UInt32)(property.mapObjectGroupType));
                     binaryWriter.Write(property.valuePairs.Count());
 
                     // Key-Value Pairs
@@ -429,12 +550,13 @@ namespace WorldReader
             binaryWriter.Seek(0x5C, SeekOrigin.Begin);
             binaryWriter.Write(fileLength);
 
+            Debug.WriteLine("WorldDatastructur written");
+
         }
 
 
 
         // HELPER
-
         private HashSet<TileMapGroup.Tile.AppearanceTile.RenderLayer> calculateTileAppearanceLength(TileMapGroup tileMapGroup)
         {
             HashSet<TileMapGroup.Tile.AppearanceTile.RenderLayer> tempSet = new HashSet<TileMapGroup.Tile.AppearanceTile.RenderLayer>();
