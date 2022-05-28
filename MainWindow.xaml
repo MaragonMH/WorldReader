@@ -197,6 +197,7 @@
                     <StackPanel Orientation="Horizontal" >
                         <Label MinWidth="150" Content="Group Type: "/>
                         <ComboBox Name="MapObjectGroupType" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object category --" MinWidth="200" SelectedValuePath="Content">
+                            <ComboBoxItem Name="MapObjectGroupTypeItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
                     </StackPanel>
@@ -204,6 +205,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Properties: "/>
                         <ComboBox Name="MapObjectProperties" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object properties set --" MinWidth="200" SelectedValuePath="Content">
+                            <ComboBoxItem Name="MapObjectPropertiesItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
                     </StackPanel>
@@ -211,6 +213,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Enemy Route Vertices: "/>
                         <ComboBox Name="MapObjectVertices" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object vertices set --" MinWidth="200" SelectedValuePath="Content">
+                            <ComboBoxItem Name="MapObjectVerticesItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
                     </StackPanel>

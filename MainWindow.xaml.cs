@@ -150,7 +150,7 @@ namespace WorldReader
 
 		private void Edit(object sender, RoutedEventArgs e)
         {
-			((Canvas)this.TileCanvas.FindName($"MapObjectGroupsCanvasItemsGeneric")).Visibility = Visibility.Collapsed;
+			worldManager.showObjectGroups();
         }
 
         // ZOOM CANVAS
