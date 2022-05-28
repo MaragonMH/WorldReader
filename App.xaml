@@ -8,6 +8,7 @@
             <SolidColorBrush x:Key="PrimaryColorBrush" Color="#64b5f6" />
             <SolidColorBrush x:Key="LightColorBrush" Color="#9be7ff" />
             <SolidColorBrush x:Key="DarkColorBrush" Color="#2286c3" />
+            <SolidColorBrush x:Key="ObjectColorBrush" Color="OrangeRed" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -29,8 +29,6 @@ namespace WorldReader
 
         public class TileVisual : DrawingVisual
         {
-            const int tileWidth = 16;
-            const int tileHeight = 16;
 
             public TileVisual(TileVisuals parent)
             {

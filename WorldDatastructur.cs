@@ -96,6 +96,41 @@ namespace WorldReader
 
                 public class CollisionTile
                 {
+                    [Flags]
+                    public enum TileFlags : uint
+                    {
+                        FlagFlipHorizontally = 0x80000000u,
+                        FlagFlipVertically = 0x40000000u,
+                        MaskFlip = 0xC0000000u,
+                        MaskDamageFlags = 0x7000000u,
+                        FlagGlitchable = 0x4000000u,
+                        FlagTriggerable = 0x2000000u,
+                        FlagDamageable = 0x1000000u,
+                        FlagUnclimbable = 0x2000u,
+                        FlagDamageableFringe = 0x1000u,
+                        FlagCastsShadow = 0x800u,
+                        FlagHandlesDamageAsNPC = 0x400u,
+                        FlagLedge = 0x200u,
+                        FlagStair = 0x100u,
+                        FlagChainDestructs = 0x80u,
+                        FlagField = 0x40u,
+                        FlagSurface = 0x20u,
+                        FlagAlternateRender = 0x10u,
+                        FlagCollision = 0x8u,
+                        FlagHidden = 0x4u,
+                        MaskCollisionShape = 0x3u,
+                        FlagEmptyTile = uint.MaxValue,
+                        FlagNone = 0x0u
+                    }
+
+                    public enum TileCollisionShape
+                    {
+                        SQUARE,
+                        LINE_FILLED,
+                        PLATFORM,
+                        INVALID
+                    }
+
                     public UInt32 CollisionFlag;
                     public Int32 LineSegmentIndex3 = Int32.MaxValue; // uninitialized 
 

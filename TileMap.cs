@@ -13,16 +13,16 @@ namespace WorldReader
 {
     public class TileMap
     {
-        const int tileWidth = 16;
-        const int tileHeight = 16;
+        public const int tileWidth = 16;
+        public const int tileHeight = 16;
         const int dpi = 96; // Result in 1:1
         private readonly byte[] emptyPixel = { 255, 255, 255, 0 };
 
         public WriteableBitmap worldImage = null;
         private BitmapFrame tileMapImage = null;
         private List<CroppedBitmap> tileMapTileImages = null;
-        private int width;
-        private int height;
+        public int width;
+        public int height;
         private int worldWidth;
         private int worldHeight;
 
@@ -58,9 +58,18 @@ namespace WorldReader
 
         public void setTile(int worldWidth, int worldHeight, int index, bool overlay = false)
         {
-            if(tileMapTileImages != null && tileMapTileImages.ElementAtOrDefault(index) != null)
+            int pixelWidth = (worldImage.Format.BitsPerPixel+7) / 8;
+            int normalizedIndex = index & (int)~WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.MaskFlip;
+            bool flipHorizontally = (((uint)index & (uint)WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.FlagFlipHorizontally) != 0);
+            bool flipVertically = (((uint)index & (uint)WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.FlagFlipVertically) != 0);
+            if (tileMapTileImages != null && tileMapTileImages.ElementAtOrDefault(normalizedIndex) != null)
             {
-                byte[] pixels = BitmapSourceToArray(tileMapTileImages[index], new Int32Rect(0, 0, tileWidth, tileHeight));
+                byte[] pixels = BitmapSourceToArray(tileMapTileImages[normalizedIndex], new Int32Rect(0, 0, tileWidth, tileHeight));
+
+                // Flip Tile if neccessary
+                if(flipHorizontally) pixels = FlipHorizontally(pixels, pixelWidth, tileWidth, tileHeight);
+                if(flipVertically) pixels = FlipVertically(pixels, pixelWidth, tileWidth, tileHeight);
+
                 Int32Rect rect = new Int32Rect(worldWidth * tileWidth, worldHeight * tileHeight, tileWidth, tileHeight);
                 // keep all pixels which are only behind new transparent pixels
                 if (overlay)
@@ -103,6 +112,32 @@ namespace WorldReader
             bitmapSource.CopyPixels(rect, pixels, stride, 0);
 
             return pixels;
+        }
+
+        private byte[] FlipVertically(byte[] pixels, int pixelWidth, int width, int height)
+        {
+            byte[] result = new byte[pixels.Count()];
+            for (int h = 0; h < height; h++)
+            {
+                for (int w = 0; w < width; w++)
+                {
+                    Buffer.BlockCopy(pixels, (h * width + w) * pixelWidth, result, ((height - h - 1) * width + w) * pixelWidth, pixelWidth);
+                }
+            }
+            return result;
+        }
+
+        private byte[] FlipHorizontally(byte[] pixels, int pixelWidth, int width, int height)
+        {
+            byte[] result = new byte[pixels.Count()];
+            for (int w = 0; w < width; w++)
+            {
+                for (int h = 0; h < height; h++)
+                {
+                    Buffer.BlockCopy(pixels, (h * width + w) * pixelWidth, result, (h * width + (width - w - 1)) * pixelWidth, pixelWidth);
+                }
+            }
+            return result;
         }
 
         private byte[] compositePixels(byte[] backgroundPixel, byte[] foregroundPixel)

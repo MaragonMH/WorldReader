@@ -76,6 +76,11 @@ namespace WorldReader
 			{
 				MessageBox.Show("Error while reading file: " + ex.Message, "File Error", MessageBoxButton.OK, MessageBoxImage.Warning);
 			}
+
+			if(this.worldManager != null)
+            {
+				this.worldManager.renderMap();
+            }
 		}
 
 		private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -137,8 +142,16 @@ namespace WorldReader
 
 		private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			this.worldManager.renderMap();
+			if (this.worldManager != null)
+			{
+				this.worldManager.renderMap();
+			}
 		}
+
+		private void Edit(object sender, RoutedEventArgs e)
+        {
+			((Canvas)this.TileCanvas.FindName($"MapObjectGroupsCanvasItemsGeneric")).Visibility = Visibility.Collapsed;
+        }
 
         // ZOOM CANVAS
         private Double zoomMax = 2;
@@ -202,6 +215,26 @@ namespace WorldReader
 		{
 			last = e.GetPosition(TileCanvas);
 			TileCanvas.CaptureMouse();
+		}
+
+		// SELECTION CANVAS
+		Point selection;
+		void CanvasMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			if (this.worldManager != null)
+			{
+				Point relative = e.GetPosition(TileCanvas);
+				if (relative.X < 0) selection.X = 0;
+				else if(relative.X > 16 * worldDatastructur.WidthTiles - 1) selection.X = worldDatastructur.WidthTiles - 1;
+				else selection.X = (int)relative.X / 16;
+				if(relative.Y < 0) selection.Y = 0;
+				else if (relative.Y > 16 * worldDatastructur.HeightTiles - 1) selection.Y = worldDatastructur.HeightTiles - 1;
+				else selection.Y = (int)relative.Y / 16;
+				Canvas.SetLeft(this.CanvasSelection, selection.X * 16);
+				Canvas.SetTop(this.CanvasSelection, selection.Y * 16);
+				this.CanvasSelection.Visibility = Visibility.Visible;
+				this.worldManager.selectTile((int)selection.X, (int)selection.Y);
+			}
 		}
 	}
 }

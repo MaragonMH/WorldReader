@@ -18,6 +18,8 @@
     </Window.CommandBindings>
 
     <DockPanel>
+        
+        <!--Tool Bar-->
         <ToolBar DockPanel.Dock="Top" Background="AliceBlue">
             <Button Command="ApplicationCommands.Open">
                 <Image Source="pack://application:,,,/img/Open.png" Width="16" Height="16" />
@@ -51,29 +53,41 @@
                 <!--Fill dynamically in WorldManager-->
             </ComboBox>
             <Separator/>
-            <Menu DockPanel.Dock="Top">
+            <Menu>
                 <MenuItem Name="Layers" Header="Layers">
                     <!--Fill dynamically in WorldManager-->
                 </MenuItem>
             </Menu>
             <Separator/>
+            <Menu>
+                <MenuItem Name="MapObjectHeaderGroups" Header="Object Groups">
+                    <!--Fill dynamically in WorldManager-->
+                </MenuItem>
+            </Menu>
+            <Separator/>
             <Button Command="ApplicationCommands.New">New</Button>
+            <Separator/>
+            <Button Click="Edit">Edits</Button>
         </ToolBar>
 
         <Grid DockPanel.Dock="Left" Width="Auto" Background="AliceBlue">
             <TextBlock Text="Property-Explorer" HorizontalAlignment="Stretch" Background="{x:Static SystemColors.WindowFrameBrush}" VerticalAlignment="Stretch" Foreground="White" TextAlignment="Center" Padding="0, 5, 0, 5"/>
 
             <TreeView Name ="TreeMenu" Width="Auto" Background="AliceBlue" BorderThickness="0" Padding="0, 10, 10, 0">
+                
+                <!--Tile Collision-->
                 <TreeViewItem Name="TileCollision" Header="Tile Collision" IsSelected="True" Visibility="Visible" IsExpanded="False">
                     <StackPanel Orientation="Horizontal" >
                         <Label MinWidth="150" Content="Properties: "/>
                         <ComboBox Name="PropertyIndex2" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a property set--" MinWidth="200" SelectedValuePath="Content">
+                            <ComboBoxItem Name="PropertyIndex2ItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Collision Set: "/>
                         <ComboBox Name="LineSegementIndex3" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a collision set --" MinWidth="200" SelectedValuePath="Content">
+                            <ComboBoxItem Name="LineSegmentIndex3ItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
                     </StackPanel>
@@ -81,8 +95,6 @@
                         <Label MinWidth="150" Content="Collision Flags: "/>
                         <TextBox Name="CollisionFlag" Text="0" Height="auto" Width="auto" VerticalContentAlignment="Center"  IsReadOnly="True" MinWidth="200"/>
                     </StackPanel>
-                    <CheckBox Name="FlagFlipHorizontally" Content="Flag: Flip Horizontally"/>
-                    <CheckBox Name="FlagFlipVertically" Content="Flag: Flip Vertically"/>
                     <CheckBox Name="FlagGlitchable" Content="Flag: Glitchable"/>
                     <CheckBox Name="FlagTriggerable" Content="Flag: Triggerable"/>
                     <CheckBox Name="FlagDamageable" Content="Flag: Damageable"/>
@@ -97,42 +109,90 @@
                     <CheckBox Name="FlagSurface" Content="Flag: Surface"/>
                     <CheckBox Name="FlagAlternateRender" Content="Flag: Alternate Render"/>
                     <CheckBox Name="FlagCollision" Content="Flag: Collision"/>
+                    <RadioButton Name="CollisionShapeSquare" GroupName="CollisionShape">Collision Shape Square</RadioButton>
+                    <RadioButton Name="CollisionShapeLineFilled" GroupName="CollisionShape">Collision Shape Line Filled</RadioButton>
+                    <RadioButton Name="CollisionShapePlatform" GroupName="CollisionShape">Collision Shape Platform</RadioButton>
+                    <RadioButton Name="CollisionShapeInvalid" GroupName="CollisionShape">Collision Shape Invalid</RadioButton>
                     <CheckBox Name="FlagHidden" Content="Flag: Hidden"/>
                     <CheckBox Name="FlagEmptyTile" Content="Flag: Empty Tile"/>
                     <CheckBox Name="FlagNone" Content="Flag: None"/>
                 </TreeViewItem>
 
+                <!--Tile Appearance--> 
                 <TreeViewItem Name="TileAppearance" Header="Tile Appearance" IsSelected="True" Visibility="Visible" IsExpanded="False">
+                    
+                    <!--Tile Appearance PrePreFG-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="PrePreFG: "/>
                         <TextBox Name="PrePreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="PrePreFGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="PrePreFGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                    </StackPanel>
+                    
+                    <!--Tile Appearance PreFG-->
+                    <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="PreFG: "/>
                         <TextBox Name="PreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="PreFGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="PreFGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                    </StackPanel>
+                    
+                    <!--Tile Appearance PreFGWater-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="PreFGWater: "/>
                         <TextBox Name="PreFGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="PreFGWaterFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="PreFGWaterFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                    </StackPanel>
+                    
+                    <!--Tile Appearance FG-->
+                    <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="FG: "/>
                         <TextBox Name="FG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="FGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="FGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                    </StackPanel>
+                    
+                    <!--Tile Appearance BGProps-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="BGProps: "/>
                         <TextBox Name="BGProps" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="BGPropsFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="BGPropsFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                    </StackPanel>
+                    
+                    <!--Tile Appearance BG-->
+                    <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="BG: "/>
                         <TextBox Name="BG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="BGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="BGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                    </StackPanel>
+                    
+                    <!--Tile Appearance BGWater-->
+                    <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="BGWater: "/>
                         <TextBox Name="BGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox Name="BGWaterFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="BGWaterFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                    </StackPanel>
                 </TreeViewItem>
 
+                <!--Map Object--> 
                 <TreeViewItem Name="MapObject" Header="MapObject" IsSelected="True" Visibility="Visible" IsExpanded="False">
                     <StackPanel Orientation="Horizontal" >
                         <Label MinWidth="150" Content="Group Type: "/>
@@ -187,6 +247,7 @@
                     </StackPanel>
                 </TreeViewItem>
 
+                <!--General--> 
                 <TreeViewItem Name="General" Header="General" IsSelected="True" Visibility="Visible" IsExpanded="False">
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="World Width: "/>
@@ -208,12 +269,20 @@
             </TreeView>
         </Grid>
 
+        <!--Display--> 
         <ScrollViewer Name="ScrollContainer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
             <Canvas Name="TileCanvas" Width="Auto" Height="Auto"  UseLayoutRounding="True" RenderOptions.BitmapScalingMode="NearestNeighbor"     
                     MouseWheel="CanvasMouseWheel"
                     MouseMove="CanvasMouseMove" 
                     MouseRightButtonUp="CanvasMouseRightButtonUp" 
-                    MouseRightButtonDown="CanvasMouseRightButtonDown">
+                    MouseRightButtonDown="CanvasMouseRightButtonDown"
+                    MouseLeftButtonUp="CanvasMouseLeftButtonUp">
+                
+                <Rectangle Name="CanvasSelection" Canvas.ZIndex="2" Width="16" Height="16" Canvas.Top="0" Canvas.Left="0" Fill="{StaticResource PrimaryColorBrush}" Opacity=".7" Visibility="Collapsed"/>
+
+                <!--Canvas for every group-->
+                    <!--Rectangle for every object in group-->
+                
                 <Canvas.RenderTransform>
                     <TransformGroup>
                         <TranslateTransform/>
