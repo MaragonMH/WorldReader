@@ -137,7 +137,7 @@ namespace WorldReader
 
 		private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			
+			this.worldManager.renderMap();
 		}
 
         // ZOOM CANVAS

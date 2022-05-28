@@ -16,6 +16,7 @@ namespace WorldReader
         const int tileWidth = 16;
         const int tileHeight = 16;
         const int dpi = 96; // Result in 1:1
+        private readonly byte[] emptyPixel = { 255, 255, 255, 0 };
 
         public WriteableBitmap worldImage = null;
         private BitmapFrame tileMapImage = null;
@@ -73,6 +74,23 @@ namespace WorldReader
                     }
                 }
                 worldImage.WritePixels(rect, pixels, pixels.Count() / tileHeight, 0);
+            }
+        }
+
+        public void unsetAllTiles()
+        {
+            byte[] pixels = new byte[tileHeight * tileWidth * worldImage.Format.BitsPerPixel];
+            for (int i = 0; i < tileHeight * tileWidth; i += 4)
+            {
+                Buffer.BlockCopy(emptyPixel, 0, pixels, i, 4);
+            }
+            for (int w = 0; w < worldWidth; w++)
+            {
+                for (int h = 0; h < worldHeight; h++)
+                {
+                    Int32Rect rect = new Int32Rect(w * tileWidth, h * tileHeight, tileWidth, tileHeight);
+                    worldImage.WritePixels(rect, pixels, pixels.Count() / tileHeight, 0);
+                }
             }
         }
 

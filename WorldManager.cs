@@ -10,12 +10,16 @@ namespace WorldReader
 {
     public class WorldManager
     {
+        private MainWindow parent = null;
         private WorldDatastructur worldDatastructur = null;
         private TileMap tileMap = null;
         private TileVisuals visualHost = null;
 
+        private bool loaded = false;
+
         public WorldManager(MainWindow parent, WorldDatastructur worldDatastructur, FileStream fileStream)
         {
+            this.parent = parent;
             this.worldDatastructur = worldDatastructur;
 
             this.tileMap = new TileMap(fileStream, worldDatastructur.WidthTiles, worldDatastructur.HeightTiles);
@@ -23,27 +27,21 @@ namespace WorldReader
             parent.TileCanvas.Children.Add(visualHost);
 
             // Build Window Components
-            buildComponents(parent);
-            
+            buildComponents();
 
-            // Initial Fill
-            string displayedTileMap = worldDatastructur.tileMapGroups.Keys.First();
-            for(int height = 0; height < worldDatastructur.HeightTiles; height++)
-            {
-                for (int width = 0; width < worldDatastructur.WidthTiles; width++)
-                {
-                    int tileIndex = width + height * worldDatastructur.WidthTiles;
-                    bool overlay = false;
-                    foreach(UInt32 appearanceIndex in worldDatastructur.tileMapGroups[displayedTileMap].tiles[tileIndex].appearanceTile.TileAppearanceIndex.Values)
-                    {
-                        tileMap.setTile(width, height, (int)appearanceIndex, overlay);
-                        overlay = true;
-                    }
-                }
-            }
+            // Initial Render
+            renderCurrentMap();
+
+            loaded = true;
         }
 
-        private void buildComponents(MainWindow parent)
+        public void renderMap()
+        {
+            if (!loaded) return;
+            renderCurrentMap();
+        }
+
+        private void buildComponents()
         {
             // Add TileMapGroups
             parent.TileMapGroups.Items.Clear();
@@ -66,7 +64,7 @@ namespace WorldReader
             foreach (WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer renderLayer in Enum.GetValues(typeof(WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer)))
             {
                 CheckBox checkBox = new CheckBox();
-                checkBox.Name = renderLayer.ToString();
+                checkBox.Name = $"Layer{renderLayer.ToString()}";
                 checkBox.Content = renderLayer.ToString();
                 checkBox.Width = parent.Layers.Width;
                 checkBox.Height = parent.Layers.Height;
@@ -143,6 +141,45 @@ namespace WorldReader
                 comboBoxItem.Visibility = Visibility.Collapsed;
                 parent.MapObjectProperties.Items.Add(comboBoxItem);
             }
+        }
+
+        private void renderCurrentMap()
+        {
+            tileMap.unsetAllTiles();
+
+            // Depends on the selected TileMapGroup and RenderLayers in the Toolbar
+            string currentTileMap = (string)parent.TileMapGroups.SelectedValue;
+            List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> usedRenderLayers = getSelectedRenderLayers(parent);
+
+            for (int height = 0; height < worldDatastructur.HeightTiles; height++)
+            {
+                for (int width = 0; width < worldDatastructur.WidthTiles; width++)
+                {
+                    int tileIndex = width + height * worldDatastructur.WidthTiles;
+                    bool overlay = false;
+                    foreach (KeyValuePair< WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer, UInt32> appearance in worldDatastructur.tileMapGroups[currentTileMap].tiles[tileIndex].appearanceTile.TileAppearanceIndex)
+                    {
+                        if (usedRenderLayers.Contains(appearance.Key))
+                        {
+                            tileMap.setTile(width, height, (int)appearance.Value, overlay);
+                            overlay = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        private List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> getSelectedRenderLayers(MainWindow parent)
+        {
+            List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> tempList = new List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer>();
+            foreach(CheckBox element in parent.Layers.Items)
+            {
+                if ((bool)element.IsChecked)
+                {
+                    tempList.Add((WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer) Enum.Parse(typeof(WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer), (string)element.Content)); 
+                }
+            }
+            return tempList;
         }
     }
 }
