@@ -190,6 +190,24 @@ namespace WorldReader
 
         }
 
+        // Attached to mapObjectHeaderGroupsCheckBoxes
+        private void changeObjectVisibility(object sender, RoutedEventArgs e)
+        {
+            showObjectGroups();
+        }
+
+        // Attached to and layers
+        private void changeMapVisibility(object sender, RoutedEventArgs e)
+        {
+            renderMap();
+        }
+
+        // Attached to tileMapGroups
+        private void changeTileMapGroupVisibility(object sender, SelectionChangedEventArgs e)
+        {
+            renderMap();
+        }
+
         public void showObjectGroups()
         {
             foreach(CheckBox checkBox in parent.MapObjectHeaderGroups.Items)
@@ -239,6 +257,7 @@ namespace WorldReader
                 }
                 parent.TileMapGroups.Items.Add(comboBoxItem);
             }
+            parent.TileMapGroups.SelectionChanged += new SelectionChangedEventHandler(changeTileMapGroupVisibility);
         }
 
         private void buildLayers()
@@ -256,6 +275,7 @@ namespace WorldReader
                 else checkBox.IsChecked = false;
                 parent.Layers.Items.Add(checkBox);
             }
+            parent.Layers.SubmenuClosed += new RoutedEventHandler(changeMapVisibility);
         }
 
         private void buildGroupSpecificPropertyIndex2(string currentTileMapGroup)
@@ -342,6 +362,8 @@ namespace WorldReader
                 // Disable the two biggest group types for better visibility
                 if ((new[] { "Room", "Generic" }).Contains(mapObjectGroupType.ToString())) checkBox.IsChecked = false;
                 else checkBox.IsChecked = true;
+                checkBox.Checked += new RoutedEventHandler(changeObjectVisibility);
+                checkBox.Unchecked += new RoutedEventHandler(changeObjectVisibility);
                 parent.MapObjectHeaderGroups.Items.Add(checkBox);
                 if (firstLoad) parent.MapObjectHeaderGroups.UnregisterName($"MapObjectHeaderGroupsItems{mapObjectGroupType.ToString()}");
                 parent.MapObjectHeaderGroups.RegisterName($"MapObjectHeaderGroupsItems{mapObjectGroupType.ToString()}", checkBox);

@@ -140,17 +140,9 @@ namespace WorldReader
 			tt.Y = 0;
 		}
 
-		private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-		{
-			if (this.worldManager != null)
-			{
-				this.worldManager.renderMap();
-			}
-		}
-
 		private void Edit(object sender, RoutedEventArgs e)
         {
-			worldManager.showObjectGroups();
+			worldManager?.showObjectGroups();
         }
 
         // ZOOM CANVAS
