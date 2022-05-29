@@ -96,16 +96,16 @@ namespace WorldReader
             WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape tileShape = (WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape)tileShapeBits;
             switch (tileShape)
             {
-                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.SQUARE:
+                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.Square:
                     parent.CollisionShapeSquare.IsChecked = true;
                     break;
-                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.LINE_FILLED:
+                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.LineFilled:
                     parent.CollisionShapeLineFilled.IsChecked = true;
                     break;
-                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.PLATFORM:
+                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.Platform:
                     parent.CollisionShapePlatform.IsChecked = true;
                     break;
-                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.INVALID:
+                case WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape.Invalid:
                     parent.CollisionShapeInvalid.IsChecked = true;
                     break;
             }
@@ -267,6 +267,7 @@ namespace WorldReader
                 else canvas.Visibility = Visibility.Collapsed;
             }
         }
+
 
         // Build these if you load a file
         private void buildComponents()

@@ -228,5 +228,30 @@ namespace WorldReader
 				this.worldManager.selectTile((int)selection.X, (int)selection.Y);
 			}
 		}
+
+		// PROPERTIES MENU
+		private void UpdateCollisionFlag(object sender, RoutedEventArgs e)
+		{
+			WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags flag = (WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags), ((CheckBox)sender).Name);
+			uint collision = uint.Parse(this.CollisionFlag.Text);
+			if ((bool)((CheckBox)sender).IsChecked) this.CollisionFlag.Text = (collision | (uint)flag).ToString();
+			else this.CollisionFlag.Text = (collision & ~((uint)flag)).ToString();
+		}
+		private void UpdateAppearanceFlip(object sender, RoutedEventArgs e)
+        {
+			WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags flag = ((CheckBox)sender).Name.EndsWith("Horizontally") ? WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.FlagFlipHorizontally : WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.FlagFlipVertically;
+			string layerName = ((CheckBox)sender).Name.Replace(flag.ToString(), "");
+			TextBox textBox = (TextBox)this.FindName(layerName);
+			uint appearance = uint.Parse(textBox.Text == "" ? "0" : textBox.Text);
+			if ((bool)((CheckBox)sender).IsChecked) textBox.Text = (appearance | (uint)flag).ToString();
+			else textBox.Text = (appearance & ~((uint)flag)).ToString();
+			if (uint.Parse(textBox.Text) == 0) textBox.Text = "";
+		}
+		private void UpdateCollisionShape(object sender, RoutedEventArgs e)
+        {
+			WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape flag = (WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape), ((RadioButton)sender).Name.Replace("CollisionShape", ""));
+			uint collision = uint.Parse(this.CollisionFlag.Text);
+			this.CollisionFlag.Text = ( (collision & ~((uint)WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.MaskCollisionShape)) | (uint)flag).ToString();
+		}
 	}
 }

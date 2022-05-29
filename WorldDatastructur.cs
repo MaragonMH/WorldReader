@@ -126,10 +126,10 @@ namespace WorldReader
 
                     public enum TileCollisionShape
                     {
-                        SQUARE,
-                        LINE_FILLED,
-                        PLATFORM,
-                        INVALID
+                        Square,
+                        LineFilled,
+                        Platform,
+                        Invalid
                     }
 
                     public UInt32 CollisionFlag;

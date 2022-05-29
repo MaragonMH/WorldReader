@@ -92,27 +92,27 @@
                         <Label MinWidth="150" Content="Collision Flags: "/>
                         <TextBox Name="CollisionFlag" Text="0" Height="auto" Width="auto" VerticalContentAlignment="Center"  IsReadOnly="True" MinWidth="200"/>
                     </StackPanel>
-                    <CheckBox Name="FlagGlitchable" Content="Flag: Glitchable"/>
-                    <CheckBox Name="FlagTriggerable" Content="Flag: Triggerable"/>
-                    <CheckBox Name="FlagDamageable" Content="Flag: Damageable"/>
-                    <CheckBox Name="FlagUnclimbable" Content="Flag: Unclimbable"/>
-                    <CheckBox Name="FlagDamageableFringe" Content="Flag: Damageable Fringe"/>
-                    <CheckBox Name="FlagCastsShadow" Content="Flag: Casts Shadow"/>
-                    <CheckBox Name="FlagHandlesDamageAsNPC" Content="Flag: Handles Damage As NPC"/>
-                    <CheckBox Name="FlagLedge" Content="Flag: Ledge"/>
-                    <CheckBox Name="FlagStair" Content="Flag: Stair"/>
-                    <CheckBox Name="FlagChainDestructs" Content="Flag: Chain Destructs"/>
-                    <CheckBox Name="FlagField" Content="Flag: Field"/>
-                    <CheckBox Name="FlagSurface" Content="Flag: Surface"/>
-                    <CheckBox Name="FlagAlternateRender" Content="Flag: Alternate Render"/>
-                    <CheckBox Name="FlagCollision" Content="Flag: Collision"/>
-                    <RadioButton Name="CollisionShapeSquare" GroupName="CollisionShape">Collision Shape Square</RadioButton>
-                    <RadioButton Name="CollisionShapeLineFilled" GroupName="CollisionShape">Collision Shape Line Filled</RadioButton>
-                    <RadioButton Name="CollisionShapePlatform" GroupName="CollisionShape">Collision Shape Platform</RadioButton>
-                    <RadioButton Name="CollisionShapeInvalid" GroupName="CollisionShape">Collision Shape Invalid</RadioButton>
-                    <CheckBox Name="FlagHidden" Content="Flag: Hidden"/>
-                    <CheckBox Name="FlagEmptyTile" Content="Flag: Empty Tile"/>
-                    <CheckBox Name="FlagNone" Content="Flag: None"/>
+                    <CheckBox Name="FlagGlitchable" Content="Flag: Glitchable" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagTriggerable" Content="Flag: Triggerable" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagDamageable" Content="Flag: Damageable" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagUnclimbable" Content="Flag: Unclimbable" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagDamageableFringe" Content="Flag: Damageable Fringe" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagCastsShadow" Content="Flag: Casts Shadow" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagHandlesDamageAsNPC" Content="Flag: Handles Damage As NPC" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagLedge" Content="Flag: Ledge" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagStair" Content="Flag: Stair" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagChainDestructs" Content="Flag: Chain Destructs" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagField" Content="Flag: Field" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagSurface" Content="Flag: Surface" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagAlternateRender" Content="Flag: Alternate Render" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagCollision" Content="Flag: Collision" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <RadioButton Name="CollisionShapeSquare" GroupName="CollisionShape" Checked="UpdateCollisionShape">Collision Shape Square</RadioButton>
+                    <RadioButton Name="CollisionShapeLineFilled" GroupName="CollisionShape" Checked="UpdateCollisionShape">Collision Shape Line Filled</RadioButton>
+                    <RadioButton Name="CollisionShapePlatform" GroupName="CollisionShape" Checked="UpdateCollisionShape">Collision Shape Platform</RadioButton>
+                    <RadioButton Name="CollisionShapeInvalid" GroupName="CollisionShape" Checked="UpdateCollisionShape">Collision Shape Invalid</RadioButton>
+                    <CheckBox Name="FlagHidden" Content="Flag: Hidden" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
+                    <CheckBox Name="FlagEmptyTile" Content="Flag: Empty Tile" IsHitTestVisible="False" Focusable="False"/>
+                    <CheckBox Name="FlagNone" Content="Flag: None" IsHitTestVisible="False" Focusable="False"/>
                 </TreeViewItem>
 
                 <!--Tile Appearance--> 
@@ -124,8 +124,8 @@
                         <TextBox Name="PrePreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Name="PrePreFGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
-                        <CheckBox Name="PrePreFGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                        <CheckBox Name="PrePreFGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
+                        <CheckBox Name="PrePreFGFlagFlipVertically" Content="Flip Vertically" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
                     </StackPanel>
                     
                     <!--Tile Appearance PreFG-->
@@ -134,8 +134,8 @@
                         <TextBox Name="PreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Name="PreFGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
-                        <CheckBox Name="PreFGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                        <CheckBox Name="PreFGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
+                        <CheckBox Name="PreFGFlagFlipVertically" Content="Flip Vertically" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
                     </StackPanel>
                     
                     <!--Tile Appearance PreFGWater-->
@@ -144,8 +144,8 @@
                         <TextBox Name="PreFGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Name="PreFGWaterFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
-                        <CheckBox Name="PreFGWaterFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                        <CheckBox Name="PreFGWaterFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
+                        <CheckBox Name="PreFGWaterFlagFlipVertically" Content="Flip Vertically" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
                     </StackPanel>
                     
                     <!--Tile Appearance FG-->
@@ -154,8 +154,8 @@
                         <TextBox Name="FG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Name="FGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
-                        <CheckBox Name="FGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                        <CheckBox Name="FGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
+                        <CheckBox Name="FGFlagFlipVertically" Content="Flip Vertically" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
                     </StackPanel>
                     
                     <!--Tile Appearance BGProps-->
@@ -164,8 +164,8 @@
                         <TextBox Name="BGProps" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Name="BGPropsFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
-                        <CheckBox Name="BGPropsFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                        <CheckBox Name="BGPropsFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
+                        <CheckBox Name="BGPropsFlagFlipVertically" Content="Flip Vertically" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
                     </StackPanel>
                     
                     <!--Tile Appearance BG-->
@@ -174,8 +174,8 @@
                         <TextBox Name="BG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Name="BGFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
-                        <CheckBox Name="BGFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                        <CheckBox Name="BGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
+                        <CheckBox Name="BGFlagFlipVertically" Content="Flip Vertically" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
                     </StackPanel>
                     
                     <!--Tile Appearance BGWater-->
@@ -184,8 +184,8 @@
                         <TextBox Name="BGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox Name="BGWaterFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
-                        <CheckBox Name="BGWaterFlipVertically" Content="Flip Vertically" MinWidth="150"/>
+                        <CheckBox Name="BGWaterFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
+                        <CheckBox Name="BGWaterFlagFlipVertically" Content="Flip Vertically" MinWidth="150"/>
                     </StackPanel>
                 </TreeViewItem>
 
