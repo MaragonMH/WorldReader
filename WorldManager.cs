@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,7 +22,12 @@ namespace WorldReader
         private TileVisuals visualHost = null;
 
         private bool loaded = false;
-        private bool firstLoad = false;
+
+        private MouseButtonEventHandler objectSelectionChanged;
+        private RoutedEventHandler mapVisibilityChanged;
+        private RoutedEventHandler objectVisibilityChanged;
+        private SelectionChangedEventHandler tileMapObjectGroupChanged;
+
 
         public WorldManager(MainWindow parent, WorldDatastructur worldDatastructur, FileStream fileStream)
         {
@@ -31,8 +38,12 @@ namespace WorldReader
             this.visualHost = new TileVisuals(tileMap);
             parent.TileCanvas.Children.Add(visualHost);
 
-            // Detect First Load
-            firstLoad = detectFirstLoad();
+            objectSelectionChanged = new MouseButtonEventHandler(selectObject);
+            mapVisibilityChanged = new RoutedEventHandler(changeMapVisibility);
+            objectVisibilityChanged = new RoutedEventHandler(changeObjectVisibility);
+            tileMapObjectGroupChanged = new SelectionChangedEventHandler(changeTileMapGroupVisibility);
+
+            parent.disableEventHandler = true;
 
             // Build Window Components
             buildComponents();
@@ -49,12 +60,31 @@ namespace WorldReader
             buildGroupSpecificComponents();
             tileMap.unsetAllTiles();
             renderCurrentMap();
+            parent.disableEventHandler = false;
+        }
+
+        public void Clean()
+        {
+            parent.TileMapGroups.SelectionChanged -= tileMapObjectGroupChanged;
+            parent.Layers.SubmenuClosed -= mapVisibilityChanged;
+            foreach(CheckBox checkbox in parent.MapObjectHeaderGroups.Items)
+            {
+                checkbox.Checked-= objectVisibilityChanged;
+                checkbox.Unchecked -= objectVisibilityChanged;
+            }
+            foreach (Canvas canvas in parent.TileCanvas.Children.OfType<Canvas>())
+            {
+                foreach (Rectangle rectangle in canvas.Children)
+                {
+                    rectangle.MouseLeftButtonUp -= objectSelectionChanged;
+                }
+            }
         }
 
         public void selectTile(int x, int y)
         {
             if(!loaded) return;
-
+            parent.disableEventHandler = true;
             WorldDatastructur.TileMapGroup.Tile tile = worldDatastructur.tileMapGroups[getCurrentTileMapGroup()].tiles[x + y * worldDatastructur.WidthTiles];
 
             // Tile collision
@@ -116,8 +146,8 @@ namespace WorldReader
                 TextBox textBox = (TextBox)parent.FindName(appearance.Key.ToString());
                 if(textBox != null)
                 {
-                    CheckBox flipHorizontally = (CheckBox)parent.FindName(appearance.Key.ToString() + "FlipHorizontally");
-                    CheckBox flipVertically = (CheckBox)parent.FindName(appearance.Key.ToString() + "FlipVertically");
+                    CheckBox flipHorizontally = (CheckBox)parent.FindName(appearance.Key.ToString() + "FlagFlipHorizontally");
+                    CheckBox flipVertically = (CheckBox)parent.FindName(appearance.Key.ToString() + "FlagFlipVertically");
 
                     if(appearance.Value != uint.MaxValue)
                     {
@@ -137,15 +167,25 @@ namespace WorldReader
                     }
                 }
             }
+
+            parent.disableEventHandler = false;
         }
 
         // Attached to every mapObject Rectangle
         private void selectObject(object sender, MouseButtonEventArgs e)
         {
+            if (!loaded) return;
+            parent.disableEventHandler = true;
+
             // Maybe there is some confliction potential here if the objects are overlapping and this is called multiple times
             // However this does not seem to be the case every click results in only one call
             int id = int.Parse(((Rectangle)sender).Name.Replace("MapObjectRectangle", ""));
             WorldDatastructur.TileMapGroup.MapObject mapObject = worldDatastructur.tileMapGroups[getCurrentTileMapGroup()].mapObjects.FirstOrDefault(o => o.id == id);
+
+            // Display ObjectGroupName
+            ComboBoxItem comboBoxItem3 = (ComboBoxItem)parent.MapObjectGroupName.FindName($"MapObjectGroupNameItem{mapObject.mapObjectGroupName}");
+            if (comboBoxItem3 != null) comboBoxItem3.IsSelected = true;
+            else parent.MapObjectGroupName.SelectedIndex = 0;
 
             // Display ObjectGroup
             ComboBoxItem comboBoxItem = (ComboBoxItem)parent.MapObjectGroupType.FindName($"MapObjectGroupTypeItem{mapObject.mapObjectGroupType}");
@@ -188,40 +228,47 @@ namespace WorldReader
             parent.MapObjectFlipVertically.IsChecked = mapObject.flipV;
             parent.MapObjectRotation.Text = mapObject.rotation.ToString();
 
+            parent.disableEventHandler = false;
         }
 
-        private void writeTile(int x, int y)
+        public void writeTile(int x, int y)
         {
+            if (!loaded) return;
+            parent.disableEventHandler = true;
             // Get Tile
-            WorldDatastructur.TileMapGroup.Tile tile = worldDatastructur.tileMapGroups[getCurrentTileMapGroup()].tiles[y * worldDatastructur.WidthTiles + x];
+            string currentTileMapGroup = getCurrentTileMapGroup();
+            WorldDatastructur.TileMapGroup.Tile tile = worldDatastructur.tileMapGroups[currentTileMapGroup].tiles[y * worldDatastructur.WidthTiles + x];
 
-            tile.PropertyIndex2 = parent.PropertyIndex2.SelectedIndex + 1;
+            tile.PropertyIndex2 = parent.PropertyIndex2.SelectedIndex == 0 ? int.MaxValue : parent.PropertyIndex2.SelectedIndex - 1;
 
             // Write Collision Tile
-            tile.collisionTile.LineSegmentIndex3 = parent.LineSegementIndex3.SelectedIndex + 1;
-            tile.collisionTile.CollisionFlag = uint.Parse(parent.CollisionFlag.Text);
+            tile.collisionTile.LineSegmentIndex3 = parent.LineSegementIndex3.SelectedIndex == 0 ? int.MaxValue : parent.LineSegementIndex3.SelectedIndex - 1;
+            tile.collisionTile.CollisionFlag = normalizeTextUInt(parent.CollisionFlag.Text);
 
             // Write Appearance Tile
-            foreach(TextBox textBox in parent.TileAppearance.Items.OfType<TextBox>())
+            foreach (WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer renderLayer in Enum.GetValues(typeof(WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer)))
             {
-                WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer renderLayer = (WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer), textBox.Name);
-                if (textBox.Text != "") tile.appearanceTile.TileAppearanceIndex[renderLayer] = uint.Parse(textBox.Text);
+                TextBox textBox = (TextBox)parent.FindName(renderLayer.ToString());
+                if (textBox.Text != "") tile.appearanceTile.TileAppearanceIndex[renderLayer] = normalizeTextUInt(textBox.Text);
                 else tile.appearanceTile.TileAppearanceIndex.Remove(renderLayer);
             }
+            renderTile(x, y, currentTileMapGroup, getSelectedRenderLayers());
 
+            parent.disableEventHandler = false;
         }
 
-        private void writeCurrentObject()
+        public void writeCurrentObject()
         {
+            if (!loaded) return;
+            parent.disableEventHandler = true;
             // Get current Object
-            int id = int.Parse(parent.MapObjectId.Text);
+            int id = (int)normalizeTextUInt(parent.MapObjectId.Text);
             WorldDatastructur.TileMapGroup.MapObject mapObject = worldDatastructur.tileMapGroups[getCurrentTileMapGroup()].mapObjects.FirstOrDefault(o => o.id == id);
 
             // Write ObjectGroupName
-            // Default to ObjectGroupType maybe needs a new comboBox
-            mapObject.mapObjectGroupName = parent.MapObjectGroupType.SelectedValue.ToString();
+            mapObject.mapObjectGroupName = parent.MapObjectGroupName.SelectedValue.ToString();
 
-            // Write ObjectGroup
+            // Write ObjectGroup -- Done in properties as well
             mapObject.mapObjectGroupType = (WorldDatastructur.TileMapGroup.MapObjectGroupType)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.MapObjectGroupType), parent.MapObjectGroupType.SelectedValue.ToString());
 
             // Write properties
@@ -231,13 +278,23 @@ namespace WorldReader
             mapObject.VerticesFromString(parent.MapObjectVertices.SelectedValue.ToString());
 
             mapObject.name = parent.MapObjectName.Text;
-            mapObject.boundsPixelX = float.Parse(parent.MapObjectBoundsPixelX.Text);
-            mapObject.boundsPixelY = float.Parse(parent.MapObjectBoundsPixelY.Text);
-            mapObject.boundsPixelWidth = float.Parse(parent.MapObjectWidth.Text);
-            mapObject.boundsPixelHeight = float.Parse(parent.MapObjectHeight.Text);
+            mapObject.boundsPixelX = normalizeTextFloat(parent.MapObjectBoundsPixelX.Text);
+            mapObject.boundsPixelY = normalizeTextFloat(parent.MapObjectBoundsPixelY.Text);
+            mapObject.boundsPixelWidth = normalizeTextFloat(parent.MapObjectWidth.Text);
+            mapObject.boundsPixelHeight = normalizeTextFloat(parent.MapObjectHeight.Text);
             mapObject.flipH = (bool)parent.MapObjectFlipHorizontally.IsChecked;
             mapObject.flipV = (bool)parent.MapObjectFlipVertically.IsChecked;
-            mapObject.rotation = float.Parse(parent.MapObjectRotation.Text);
+            mapObject.rotation = normalizeTextFloat(parent.MapObjectRotation.Text);
+
+            // Change CurrentObject Visuals as well
+            Rectangle displayedObject = (Rectangle)parent.TileCanvas.FindName($"MapObjectRectangle{id.ToString()}");
+            Canvas.SetLeft(displayedObject, mapObject.boundsPixelX);
+            Canvas.SetTop(displayedObject, mapObject.boundsPixelY);
+            displayedObject.Width = mapObject.boundsPixelWidth;
+            displayedObject.Height = mapObject.boundsPixelHeight;
+            ((RotateTransform)displayedObject.LayoutTransform).Angle = mapObject.rotation;
+
+            parent.disableEventHandler = false;
         }
 
         // Attached to mapObjectHeaderGroupsCheckBoxes
@@ -282,12 +339,15 @@ namespace WorldReader
         // Build these if you swap Layer or TileMapGroup or load a file (but then after buildComponents())
         private void buildGroupSpecificComponents()
         {
-            string currentTileMapGroup = parent.TileMapGroups.SelectedValue.ToString();
+            parent.disableEventHandler = true;
+            string currentTileMapGroup = getCurrentTileMapGroup();
             buildGroupSpecificPropertyIndex2(currentTileMapGroup);
             buildGroupSpecificLineSegmentIndex3(currentTileMapGroup);
+            buildGroupSpecificMapObjectGroupName(currentTileMapGroup);
             buildGroupSpecificMapObjectProperties(currentTileMapGroup);
             buildGroupSpecificMapObjectVertices(currentTileMapGroup);
             buildGroupSpecificMapObjectVisuals(currentTileMapGroup);
+            parent.disableEventHandler = false;
         }
 
         // BUILD COMPONENTS
@@ -308,7 +368,7 @@ namespace WorldReader
                 }
                 parent.TileMapGroups.Items.Add(comboBoxItem);
             }
-            parent.TileMapGroups.SelectionChanged += new SelectionChangedEventHandler(changeTileMapGroupVisibility);
+            parent.TileMapGroups.SelectionChanged += tileMapObjectGroupChanged;
         }
 
         private void buildLayers()
@@ -326,7 +386,7 @@ namespace WorldReader
                 else checkBox.IsChecked = false;
                 parent.Layers.Items.Add(checkBox);
             }
-            parent.Layers.SubmenuClosed += new RoutedEventHandler(changeMapVisibility);
+            parent.Layers.SubmenuClosed += mapVisibilityChanged;
         }
 
         private void buildGroupSpecificPropertyIndex2(string currentTileMapGroup)
@@ -365,8 +425,23 @@ namespace WorldReader
                 comboBoxItem.Name = $"MapObjectGroupTypeItem{mapObjectGroupType}";
                 comboBoxItem.Content = mapObjectGroupType.ToString();
                 parent.MapObjectGroupType.Items.Add(comboBoxItem);
-                if (firstLoad) parent.MapObjectGroupType.UnregisterName($"MapObjectGroupTypeItem{mapObjectGroupType}");
+                if (parent.MapObjectGroupType.FindName($"MapObjectGroupTypeItem{mapObjectGroupType}") != null) parent.MapObjectGroupType.UnregisterName($"MapObjectGroupTypeItem{mapObjectGroupType}");
                 parent.MapObjectGroupType.RegisterName($"MapObjectGroupTypeItem{mapObjectGroupType}", comboBoxItem);
+            }
+        }
+
+        private void buildGroupSpecificMapObjectGroupName(string currentTileMapGroup)
+        {
+            // Add MapObject Properties
+            removeAllButFirst(parent.MapObjectGroupName);
+            foreach (WorldDatastructur.TileMapGroup.MapObject mapObject in worldDatastructur.tileMapGroups[currentTileMapGroup].mapObjects.GroupBy(o => o.mapObjectGroupName).Select(group => group.First()))
+            {
+                ComboBoxItem comboBoxItem = new ComboBoxItem();
+                comboBoxItem.Name = $"MapObjectGroupNameItem{mapObject.mapObjectGroupName}";
+                comboBoxItem.Content = mapObject.mapObjectGroupName;
+                parent.MapObjectGroupName.Items.Add(comboBoxItem);
+                if (parent.MapObjectGroupName.FindName($"MapObjectGroupNameItem{mapObject.mapObjectGroupName}") != null) parent.MapObjectGroupName.UnregisterName($"MapObjectGroupNameItem{mapObject.mapObjectGroupName}");
+                parent.MapObjectGroupName.RegisterName($"MapObjectGroupNameItem{mapObject.mapObjectGroupName}", comboBoxItem);
             }
         }
 
@@ -377,7 +452,7 @@ namespace WorldReader
             foreach (WorldDatastructur.TileMapGroup.MapObject mapObject in worldDatastructur.tileMapGroups[currentTileMapGroup].mapObjects)
             {
                 ComboBoxItem comboBoxItem = new ComboBoxItem();
-                comboBoxItem.Name = $"MapObjectPropertiesItem{mapObject.mapObjectGroupType}";
+                comboBoxItem.Name = $"MapObjectPropertiesItem{mapObject.mapObjectGroupType.ToString()}";
                 comboBoxItem.Content = mapObject.PropertiesToString();
                 comboBoxItem.Visibility = Visibility.Collapsed;
                 parent.MapObjectProperties.Items.Add(comboBoxItem);
@@ -416,7 +491,7 @@ namespace WorldReader
                 checkBox.Checked += new RoutedEventHandler(changeObjectVisibility);
                 checkBox.Unchecked += new RoutedEventHandler(changeObjectVisibility);
                 parent.MapObjectHeaderGroups.Items.Add(checkBox);
-                if (firstLoad) parent.MapObjectHeaderGroups.UnregisterName($"MapObjectHeaderGroupsItems{mapObjectGroupType.ToString()}");
+                if (parent.MapObjectHeaderGroups.FindName($"MapObjectHeaderGroupsItems{mapObjectGroupType.ToString()}") != null) parent.MapObjectHeaderGroups.UnregisterName($"MapObjectHeaderGroupsItems{mapObjectGroupType.ToString()}");
                 parent.MapObjectHeaderGroups.RegisterName($"MapObjectHeaderGroupsItems{mapObjectGroupType.ToString()}", checkBox);
             }
         }
@@ -444,7 +519,7 @@ namespace WorldReader
                     if ((bool)mapObjectHeaderGroup.IsChecked) canvas.Visibility = Visibility.Visible;
                     Canvas.SetZIndex(canvas, 1);
                     parent.TileCanvas.Children.Add(canvas);
-                    if (firstLoad) parent.TileCanvas.UnregisterName($"MapObjectGroupsCanvasItems{mapObjectGroupType.ToString()}");
+                    if(parent.TileCanvas.FindName($"MapObjectGroupsCanvasItems{ mapObjectGroupType.ToString()}") != null) parent.TileCanvas.UnregisterName($"MapObjectGroupsCanvasItems{mapObjectGroupType.ToString()}");
                     parent.TileCanvas.RegisterName($"MapObjectGroupsCanvasItems{mapObjectGroupType.ToString()}", canvas);
                 }
             }
@@ -463,9 +538,14 @@ namespace WorldReader
                 Canvas.SetTop(displayedObject, mapObject.boundsPixelY);
                 displayedObject.Width = mapObject.boundsPixelWidth;
                 displayedObject.Height = mapObject.boundsPixelHeight;
+                displayedObject.MinWidth = 3; // Set Min Width to avoid accidental object invisibility
+                displayedObject.MinHeight = 3; // Set Min Height to avoid accidental object invisibility
+                displayedObject.LayoutTransform = new RotateTransform(mapObject.rotation);
                 Canvas groupCanvas = (Canvas)parent.TileCanvas.FindName($"MapObjectGroupsCanvasItems{mapObject.mapObjectGroupType.ToString()}");
                 groupCanvas.Children.Add(displayedObject);
-                displayedObject.MouseLeftButtonUp += new MouseButtonEventHandler(selectObject);
+                if(parent.TileCanvas.FindName($"MapObjectRectangle{mapObject.id.ToString()}") != null) parent.TileCanvas.UnregisterName($"MapObjectRectangle{mapObject.id.ToString()}");
+                parent.TileCanvas.RegisterName($"MapObjectRectangle{mapObject.id.ToString()}", displayedObject);
+                displayedObject.MouseLeftButtonUp += objectSelectionChanged;
             }
         }
 
@@ -491,22 +571,26 @@ namespace WorldReader
         {
             // Depends on the selected TileMapGroup and RenderLayers in the Toolbar
             string currentTileMap = getCurrentTileMapGroup();
-            List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> usedRenderLayers = getSelectedRenderLayers(parent);
+            List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> usedRenderLayers = getSelectedRenderLayers();
 
             for (int height = 0; height < worldDatastructur.HeightTiles; height++)
             {
                 for (int width = 0; width < worldDatastructur.WidthTiles; width++)
                 {
-                    int tileIndex = width + height * worldDatastructur.WidthTiles;
-                    bool overlay = false;
-                    foreach (KeyValuePair< WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer, UInt32> appearance in worldDatastructur.tileMapGroups[currentTileMap].tiles[tileIndex].appearanceTile.TileAppearanceIndex)
-                    {
-                        if (usedRenderLayers.Contains(appearance.Key))
-                        {
-                            tileMap.setTile(width, height, (int)appearance.Value, overlay);
-                            overlay = true;
-                        }
-                    }
+                    renderTile(width, height, currentTileMap, usedRenderLayers);
+                }
+            }
+        }
+        private void renderTile(int width, int height, string currentTileMap, List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> usedRenderLayers)
+        {
+            int tileIndex = width + height * worldDatastructur.WidthTiles;
+            bool overlay = false;
+            foreach (KeyValuePair<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer, UInt32> appearance in worldDatastructur.tileMapGroups[currentTileMap].tiles[tileIndex].appearanceTile.TileAppearanceIndex)
+            {
+                if (usedRenderLayers.Contains(appearance.Key))
+                {
+                    tileMap.setTile(width, height, (int)appearance.Value, overlay);
+                    overlay = true;
                 }
             }
         }
@@ -515,11 +599,6 @@ namespace WorldReader
         private string getCurrentTileMapGroup()
         {
             return (string)parent.TileMapGroups.SelectedValue;
-        }
-
-        private bool detectFirstLoad()
-        {
-            return parent.TileMapGroups.Items.Count > 0;
         }
 
         private void removeAllButFirst(ComboBox comboBox)
@@ -533,7 +612,19 @@ namespace WorldReader
             }
         }
 
-        private List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> getSelectedRenderLayers(MainWindow parent)
+        private uint normalizeTextUInt(string str)
+        {
+            if (uint.TryParse(str, out uint value)) return value;
+            return 0;
+        }
+
+        private float normalizeTextFloat(string str)
+        {
+            if(float.TryParse(str, out float value)) return value;
+            return 0;
+        }
+
+        private List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> getSelectedRenderLayers()
         {
             List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer> tempList = new List<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer>();
             foreach(CheckBox element in parent.Layers.Items)

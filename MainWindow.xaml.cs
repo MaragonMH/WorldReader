@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace WorldReader
 {
@@ -25,6 +26,7 @@ namespace WorldReader
     {
 		private WorldDatastructur worldDatastructur = null;
 		private WorldManager worldManager = null;
+		public bool disableEventHandler = false;
 
 		public class MenuItem
 		{
@@ -67,6 +69,9 @@ namespace WorldReader
 					dlg1.Filter = "AV2 TileMap File(*.png)|*.png";
 					if (dlg1.ShowDialog() == true && dlg1.FileName.EndsWith(".png"))
 					{
+						// Remove old data
+						this.worldManager?.Clean();
+
 						FileStream fileStream = new FileStream(dlg1.FileName, FileMode.Open, FileAccess.Read);
 						this.worldManager = new WorldManager(this, worldDatastructur, fileStream);
 					}
@@ -232,6 +237,7 @@ namespace WorldReader
 		// PROPERTIES MENU
 		private void UpdateCollisionFlag(object sender, RoutedEventArgs e)
 		{
+			if (disableEventHandler) return;
 			WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags flag = (WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags), ((CheckBox)sender).Name);
 			uint collision = uint.Parse(this.CollisionFlag.Text);
 			if ((bool)((CheckBox)sender).IsChecked) this.CollisionFlag.Text = (collision | (uint)flag).ToString();
@@ -239,6 +245,7 @@ namespace WorldReader
 		}
 		private void UpdateAppearanceFlip(object sender, RoutedEventArgs e)
         {
+			if (disableEventHandler) return;
 			WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags flag = ((CheckBox)sender).Name.EndsWith("Horizontally") ? WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.FlagFlipHorizontally : WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.FlagFlipVertically;
 			string layerName = ((CheckBox)sender).Name.Replace(flag.ToString(), "");
 			TextBox textBox = (TextBox)this.FindName(layerName);
@@ -249,9 +256,37 @@ namespace WorldReader
 		}
 		private void UpdateCollisionShape(object sender, RoutedEventArgs e)
         {
+			if (disableEventHandler) return;
 			WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape flag = (WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileCollisionShape), ((RadioButton)sender).Name.Replace("CollisionShape", ""));
 			uint collision = uint.Parse(this.CollisionFlag.Text);
 			this.CollisionFlag.Text = ( (collision & ~((uint)WorldDatastructur.TileMapGroup.Tile.CollisionTile.TileFlags.MaskCollisionShape)) | (uint)flag).ToString();
 		}
+		private void UpdateTile(object sender, RoutedEventArgs e)
+        {
+			if (disableEventHandler) return;
+			this.worldManager?.writeTile((int)selection.X, (int)selection.Y);
+		}
+		private void UpdateMapObject(object sender, RoutedEventArgs e)
+        {
+			if (disableEventHandler) return;
+			this.worldManager?.writeCurrentObject();
+        }
+		private void UpdateMapProperties(object sender, RoutedEventArgs e)
+        {
+			ComboBox comboBox = ((ComboBox)sender);
+			string str = comboBox.SelectedValue?.ToString();
+			if (str == null) return;
+			foreach(ComboBoxItem comboBoxItem in this.MapObjectProperties.Items)
+            {
+				if (comboBoxItem.Name == $"MapObjectPropertiesItem{str}")
+                {
+					comboBoxItem.Visibility = Visibility.Visible;
+                }
+				else
+                {
+					comboBoxItem.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
 	}
 }

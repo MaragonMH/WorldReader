@@ -211,10 +211,10 @@ namespace WorldReader
 
                 public string PropertiesToString()
                 {
-                    string result = $"Type: {mapObjectGroupType.ToString()}\n";
+                    string result = $"Type: {mapObjectGroupType.ToString()}";
                     foreach (KeyValuePair<string, string> pair in this.valuePairs)
                     {
-                        result += $"K: {pair.Key}, V: {pair.Value}\n";
+                        result += $"\nK: {pair.Key}, V: {pair.Value}";
                     }
                     return result;
                 }
@@ -234,7 +234,7 @@ namespace WorldReader
                         else
                         {
                             var search = Regex.Match(line, @"K:(.*),V:(.*)").Groups;
-                            valuePairs.Add(search[0].Value, search[1].Value);
+                            valuePairs.Add(search[1].Value, search[2].Value);
                         }
                     }
                 }
@@ -242,9 +242,12 @@ namespace WorldReader
                 public string VerticesToString()
                 {
                     string result = $"";
+                    bool first = true;
                     foreach (Tuple<Single, Single> vertex in this.vertices)
                     {
-                        result += $"X: {vertex.Item1}, Y: {vertex.Item2}\n"; ;
+                        result += first ? "" : "\n";
+                        result += $"X: {vertex.Item1}, Y: {vertex.Item2}";
+                        first = false;
                     }
                     return result;
                 }
@@ -257,8 +260,8 @@ namespace WorldReader
                     string[] verticesTextList = verticesText.Split("\n");
                     foreach (string line in verticesTextList)
                     {
-                        var search = Regex.Match(line, @"X:(.*),Y:(.*)").Groups;
-                        vertices.Add(new Tuple<Single, Single>(Single.Parse(search[0].Value), Single.Parse(search[1].Value)));
+                        GroupCollection search = Regex.Match(line, @"X:(.*),Y:(.*)").Groups;
+                        vertices.Add(new Tuple<Single, Single>(Single.Parse(search[1].Value), Single.Parse(search[2].Value)));
                     }
                 }
             }

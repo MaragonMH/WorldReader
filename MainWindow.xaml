@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WorldReader"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1000">
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" Executed="Open_Executed" />
         <CommandBinding Command="ApplicationCommands.Save" Executed="Save_Executed" />
@@ -76,21 +76,21 @@
                 <TreeViewItem Name="TileCollision" Header="Tile Collision" IsSelected="True" Visibility="Visible" IsExpanded="False">
                     <StackPanel Orientation="Horizontal" >
                         <Label MinWidth="150" Content="Properties: "/>
-                        <ComboBox Name="PropertyIndex2" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a property set--" MinWidth="200" SelectedValuePath="Content">
+                        <ComboBox Name="PropertyIndex2" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a property set--" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateTile">
                             <ComboBoxItem Name="PropertyIndex2ItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Collision Set: "/>
-                        <ComboBox Name="LineSegementIndex3" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a collision set --" MinWidth="200" SelectedValuePath="Content">
+                        <ComboBox Name="LineSegementIndex3" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose a collision set --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateTile">
                             <ComboBoxItem Name="LineSegmentIndex3ItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Collision Flags: "/>
-                        <TextBox Name="CollisionFlag" Text="0" Height="auto" Width="auto" VerticalContentAlignment="Center"  IsReadOnly="True" MinWidth="200"/>
+                        <TextBox Name="CollisionFlag" Text="0" Height="auto" Width="auto" VerticalContentAlignment="Center"  IsReadOnly="True" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <CheckBox Name="FlagGlitchable" Content="Flag: Glitchable" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
                     <CheckBox Name="FlagTriggerable" Content="Flag: Triggerable" Checked="UpdateCollisionFlag" Unchecked="UpdateCollisionFlag"/>
@@ -121,7 +121,7 @@
                     <!--Tile Appearance PrePreFG-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="PrePreFG: "/>
-                        <TextBox Name="PrePreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="PrePreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Name="PrePreFGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
@@ -131,7 +131,7 @@
                     <!--Tile Appearance PreFG-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="PreFG: "/>
-                        <TextBox Name="PreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="PreFG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Name="PreFGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
@@ -141,7 +141,7 @@
                     <!--Tile Appearance PreFGWater-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="PreFGWater: "/>
-                        <TextBox Name="PreFGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="PreFGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Name="PreFGWaterFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
@@ -151,7 +151,7 @@
                     <!--Tile Appearance FG-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="FG: "/>
-                        <TextBox Name="FG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="FG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Name="FGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
@@ -161,7 +161,7 @@
                     <!--Tile Appearance BGProps-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="BGProps: "/>
-                        <TextBox Name="BGProps" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="BGProps" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Name="BGPropsFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
@@ -171,7 +171,7 @@
                     <!--Tile Appearance BG-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="BG: "/>
-                        <TextBox Name="BG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="BG" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Name="BGFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150" Checked="UpdateAppearanceFlip" Unchecked="UpdateAppearanceFlip"/>
@@ -181,7 +181,7 @@
                     <!--Tile Appearance BGWater-->
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="BGWater: "/>
-                        <TextBox Name="BGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="BGWater" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateTile"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <CheckBox Name="BGWaterFlagFlipHorizontally" Content="Flip Horizontally" MinWidth="150"/>
@@ -191,9 +191,17 @@
 
                 <!--Map Object--> 
                 <TreeViewItem Name="MapObject" Header="MapObject" IsSelected="True" Visibility="Visible" IsExpanded="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Group Name: "/>
+                        <ComboBox Name="MapObjectGroupName" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your group name --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateMapObject">
+                            <ComboBoxItem Name="MapObjectGroupNameItemEmpty" Content="None"/>
+                            <!--Fill dynamically in WorldManager-->
+                        </ComboBox>
+                    </StackPanel>
+
                     <StackPanel Orientation="Horizontal" >
                         <Label MinWidth="150" Content="Group Type: "/>
-                        <ComboBox Name="MapObjectGroupType" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object category --" MinWidth="200" SelectedValuePath="Content">
+                        <ComboBox Name="MapObjectGroupType" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object category --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateMapProperties">
                             <ComboBoxItem Name="MapObjectGroupTypeItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
@@ -201,7 +209,7 @@
                     
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Properties: "/>
-                        <ComboBox Name="MapObjectProperties" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object properties set --" MinWidth="200" SelectedValuePath="Content">
+                        <ComboBox Name="MapObjectProperties" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object properties set --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateMapObject">
                             <ComboBoxItem Name="MapObjectPropertiesItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
@@ -209,7 +217,7 @@
 
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Enemy Route Vertices: "/>
-                        <ComboBox Name="MapObjectVertices" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object vertices set --" MinWidth="200" SelectedValuePath="Content">
+                        <ComboBox Name="MapObjectVertices" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object vertices set --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateMapObject">
                             <ComboBoxItem Name="MapObjectVerticesItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>
@@ -217,7 +225,7 @@
 
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Name: "/>
-                        <TextBox Name="MapObjectName" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="MapObjectName" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateMapObject"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Id: "/>
@@ -225,25 +233,25 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Position X: "/>
-                        <TextBox Name="MapObjectBoundsPixelX" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="MapObjectBoundsPixelX" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateMapObject"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Position Y: "/>
-                        <TextBox Name="MapObjectBoundsPixelY" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="MapObjectBoundsPixelY" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateMapObject"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Width: "/>
-                        <TextBox Name="MapObjectWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="MapObjectWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateMapObject"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Height: "/>
-                        <TextBox Name="MapObjectHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="MapObjectHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateMapObject"/>
                     </StackPanel>
-                    <CheckBox Name="MapObjectFlipHorizontally" Content="Flip Horizontally"/>
-                    <CheckBox Name="MapObjectFlipVertically" Content="Flip Vertically"/>
+                    <CheckBox Name="MapObjectFlipHorizontally" Content="Flip Horizontally" Checked="UpdateMapObject" Unchecked="UpdateMapObject"/>
+                    <CheckBox Name="MapObjectFlipVertically" Content="Flip Vertically" Checked="UpdateMapObject" Unchecked="UpdateMapObject"/>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Rotation: "/>
-                        <TextBox Name="MapObjectRotation" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="MapObjectRotation" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" TextChanged="UpdateMapObject"/>
                     </StackPanel>
                 </TreeViewItem>
 
