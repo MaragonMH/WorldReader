@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WorldReader
@@ -218,6 +219,26 @@ namespace WorldReader
                     return result;
                 }
 
+                public void PropertiesFromString(string propertiesText)
+                {
+                    valuePairs.Clear();
+                    if (propertiesText == "None") return;
+                    propertiesText = propertiesText.Replace(" ", "");
+                    string[] propertyTextList = propertiesText.Split("\n");
+                    foreach (string line in propertyTextList)
+                    {
+                        if (propertyTextList.First() == line)
+                        {
+                            this.mapObjectGroupType = (MapObjectGroupType) Enum.Parse(typeof(MapObjectGroupType), line.Replace("Type:", ""));
+                        }
+                        else
+                        {
+                            var search = Regex.Match(line, @"K:(.*),V:(.*)").Groups;
+                            valuePairs.Add(search[0].Value, search[1].Value);
+                        }
+                    }
+                }
+
                 public string VerticesToString()
                 {
                     string result = $"";
@@ -226,6 +247,19 @@ namespace WorldReader
                         result += $"X: {vertex.Item1}, Y: {vertex.Item2}\n"; ;
                     }
                     return result;
+                }
+
+                public void VerticesFromString(string verticesText)
+                {
+                    vertices.Clear();
+                    if (verticesText == "None") return;
+                    verticesText = verticesText.Replace(" ", "");
+                    string[] verticesTextList = verticesText.Split("\n");
+                    foreach (string line in verticesTextList)
+                    {
+                        var search = Regex.Match(line, @"X:(.*),Y:(.*)").Groups;
+                        vertices.Add(new Tuple<Single, Single>(Single.Parse(search[0].Value), Single.Parse(search[1].Value)));
+                    }
                 }
             }
 

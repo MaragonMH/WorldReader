@@ -251,19 +251,19 @@
                 <TreeViewItem Name="General" Header="General" IsSelected="True" Visibility="Visible" IsExpanded="False">
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="World Width: "/>
-                        <TextBox Name="WorldWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="WorldWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" IsReadOnly="True"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="World Height:"/>
-                        <TextBox Name="WorldHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="WorldHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" IsReadOnly="True"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Tileset Map Width:"/>
-                        <TextBox Name="TileSetMapWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="TileSetMapWidth" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" IsReadOnly="True"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Tileset Map Height:"/>
-                        <TextBox Name="TileSetMapHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                        <TextBox Name="TileSetMapHeight" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200" IsReadOnly="True"/>
                     </StackPanel>
                 </TreeViewItem>
             </TreeView>

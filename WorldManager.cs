@@ -190,6 +190,56 @@ namespace WorldReader
 
         }
 
+        private void writeTile(int x, int y)
+        {
+            // Get Tile
+            WorldDatastructur.TileMapGroup.Tile tile = worldDatastructur.tileMapGroups[getCurrentTileMapGroup()].tiles[y * worldDatastructur.WidthTiles + x];
+
+            tile.PropertyIndex2 = parent.PropertyIndex2.SelectedIndex + 1;
+
+            // Write Collision Tile
+            tile.collisionTile.LineSegmentIndex3 = parent.LineSegementIndex3.SelectedIndex + 1;
+            tile.collisionTile.CollisionFlag = uint.Parse(parent.CollisionFlag.Text);
+
+            // Write Appearance Tile
+            foreach(TextBox textBox in parent.TileAppearance.Items.OfType<TextBox>())
+            {
+                WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer renderLayer = (WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer), textBox.Name);
+                if (textBox.Text != "") tile.appearanceTile.TileAppearanceIndex[renderLayer] = uint.Parse(textBox.Text);
+                else tile.appearanceTile.TileAppearanceIndex.Remove(renderLayer);
+            }
+
+        }
+
+        private void writeCurrentObject()
+        {
+            // Get current Object
+            int id = int.Parse(parent.MapObjectId.Text);
+            WorldDatastructur.TileMapGroup.MapObject mapObject = worldDatastructur.tileMapGroups[getCurrentTileMapGroup()].mapObjects.FirstOrDefault(o => o.id == id);
+
+            // Write ObjectGroupName
+            // Default to ObjectGroupType maybe needs a new comboBox
+            mapObject.mapObjectGroupName = parent.MapObjectGroupType.SelectedValue.ToString();
+
+            // Write ObjectGroup
+            mapObject.mapObjectGroupType = (WorldDatastructur.TileMapGroup.MapObjectGroupType)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.MapObjectGroupType), parent.MapObjectGroupType.SelectedValue.ToString());
+
+            // Write properties
+            mapObject.PropertiesFromString(parent.MapObjectProperties.SelectedValue.ToString());
+
+            // Write vertices
+            mapObject.VerticesFromString(parent.MapObjectVertices.SelectedValue.ToString());
+
+            mapObject.name = parent.MapObjectName.Text;
+            mapObject.boundsPixelX = float.Parse(parent.MapObjectBoundsPixelX.Text);
+            mapObject.boundsPixelY = float.Parse(parent.MapObjectBoundsPixelY.Text);
+            mapObject.boundsPixelWidth = float.Parse(parent.MapObjectWidth.Text);
+            mapObject.boundsPixelHeight = float.Parse(parent.MapObjectHeight.Text);
+            mapObject.flipH = (bool)parent.MapObjectFlipHorizontally.IsChecked;
+            mapObject.flipV = (bool)parent.MapObjectFlipVertically.IsChecked;
+            mapObject.rotation = float.Parse(parent.MapObjectRotation.Text);
+        }
+
         // Attached to mapObjectHeaderGroupsCheckBoxes
         private void changeObjectVisibility(object sender, RoutedEventArgs e)
         {
