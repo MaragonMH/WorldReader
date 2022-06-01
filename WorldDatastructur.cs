@@ -223,17 +223,16 @@ namespace WorldReader
                 {
                     valuePairs.Clear();
                     if (propertiesText == "None") return;
-                    propertiesText = propertiesText.Replace(" ", "");
                     string[] propertyTextList = propertiesText.Split("\n");
                     foreach (string line in propertyTextList)
                     {
                         if (propertyTextList.First() == line)
                         {
-                            this.mapObjectGroupType = (MapObjectGroupType) Enum.Parse(typeof(MapObjectGroupType), line.Replace("Type:", ""));
+                            this.mapObjectGroupType = (MapObjectGroupType) Enum.Parse(typeof(MapObjectGroupType), line.Replace("Type: ", ""));
                         }
                         else
                         {
-                            var search = Regex.Match(line, @"K:(.*),V:(.*)").Groups;
+                            var search = Regex.Match(line, @"K: (.*), V: (.*)").Groups;
                             valuePairs.Add(search[1].Value, search[2].Value);
                         }
                     }
@@ -256,11 +255,10 @@ namespace WorldReader
                 {
                     vertices.Clear();
                     if (verticesText == "None") return;
-                    verticesText = verticesText.Replace(" ", "");
                     string[] verticesTextList = verticesText.Split("\n");
                     foreach (string line in verticesTextList)
                     {
-                        GroupCollection search = Regex.Match(line, @"X:(.*),Y:(.*)").Groups;
+                        GroupCollection search = Regex.Match(line, @"X: (.*),Y: (.*)").Groups;
                         vertices.Add(new Tuple<Single, Single>(Single.Parse(search[1].Value), Single.Parse(search[2].Value)));
                     }
                 }
@@ -511,9 +509,15 @@ namespace WorldReader
                     
                     for (int i = 0; i < numberOfNext; i++)
                     {
-                        if (!tileMapGroup.Value.tiles[i].appearanceTile.TileAppearanceIndex.ContainsKey(renderLayer)) continue;
-                        UInt32 tileAppearanceIndex = tileMapGroup.Value.tiles[i].appearanceTile.TileAppearanceIndex[renderLayer];
-                        binaryWriter.Write(tileAppearanceIndex);
+                        if (!tileMapGroup.Value.tiles[i].appearanceTile.TileAppearanceIndex.ContainsKey(renderLayer))
+                        {
+                            binaryWriter.Write(uint.MaxValue);
+                        }
+                        else
+                        {
+                            UInt32 tileAppearanceIndex = tileMapGroup.Value.tiles[i].appearanceTile.TileAppearanceIndex[renderLayer];
+                            binaryWriter.Write(tileAppearanceIndex);
+                        }
                     }
                 }
 

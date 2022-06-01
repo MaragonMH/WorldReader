@@ -141,6 +141,12 @@ namespace WorldReader
             }
 
             // Tile appearance
+            // Clear all boxes
+            foreach (WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer renderLayer in Enum.GetValues(typeof(WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer)))
+            {
+                TextBox textBox = (TextBox)parent.FindName(renderLayer.ToString());
+                textBox.Text = "";
+            }
             foreach (KeyValuePair<WorldDatastructur.TileMapGroup.Tile.AppearanceTile.RenderLayer, uint> appearance in tile.appearanceTile.TileAppearanceIndex)
             {
                 TextBox textBox = (TextBox)parent.FindName(appearance.Key.ToString());
@@ -499,14 +505,6 @@ namespace WorldReader
         private void buildMapObjectCanvasGroups()
         {
             // Add MapObject Canvas Groups for Rectangle
-            // Remove all canvas elements
-            for(int i = 0; i < parent.TileCanvas.Children.Count; i++)
-            {
-                if(parent.TileCanvas.Children[i].GetType() == typeof(Canvas))
-                {
-                    parent.TileCanvas.Children.RemoveAt(i); 
-                }
-            }
 
             foreach (WorldDatastructur.TileMapGroup.MapObjectGroupType mapObjectGroupType in Enum.GetValues(typeof(WorldDatastructur.TileMapGroup.MapObjectGroupType)))
             {
