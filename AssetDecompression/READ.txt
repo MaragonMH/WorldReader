@@ -1,0 +1,6 @@
+Run in cmd
+-npm install
+-npm start
+Drop compressed files into compressed 
+Or drop changed files into decompressed to patch them
+To get the decompressed files in decompressed folder
