@@ -4,7 +4,7 @@ Axiom Verge 2 World Reader to create modificated game files.
 
 ## Installation
 - Download [.net 6.0](https://dotnet.microsoft.com/en-us/download)
-- Download this app from the [release](https://github.com/MartinBarufke/WorldReader/releases) section
+- Download this app from the [release](https://github.com/MaragonMH/WorldReader/releases) section
 
 ## Usage
 ###### Recommended:
@@ -66,11 +66,9 @@ You need to select a tile or object with you left mouse beforehand.
 
 ### Visibility Options
 This app grants you the ability to change the selected 
-Tile Map (Outside, Inside, Breach), 
-Render Layer (PrePreFG, PreFG, PreFGWater, FG, BG, BGProps, BG, BGWater) and
-Object Group (ApocalypseUrn, Boss, BreachPortal, Damageable, DamageTrigger, ExteriorDoor, ForceField, Generic, GlitchableTile, 
-  GenericRegion, Item, Lattice, NPC, ParticleObject, Room, RoomAction, RoomTransition, PasscodeAction, SavePoint, SecretWorld, 
-  SecretWorldEntrance, SecretWorldItem, TileNPC, TriggerRegion, UdugDoor).
+- Tile Map (Outside, Inside, Breach), 
+- Render Layer (PrePreFG, PreFG, PreFGWater, FG, BG, BGProps, BG, BGWater) and
+- Object Group (ApocalypseUrn, Boss, BreachPortal, Damageable, DamageTrigger, ExteriorDoor, ForceField, Generic, GlitchableTile,  GenericRegion, Item, Lattice, NPC, ParticleObject, Room, RoomAction, RoomTransition, PasscodeAction, SavePoint, SecretWorld, SecretWorldEntrance, SecretWorldItem, TileNPC, TriggerRegion, UdugDoor).
   
 ### Create Map Object
 Comming soon. Hopefully
