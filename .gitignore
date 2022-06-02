@@ -364,3 +364,7 @@ FodyWeavers.xsd
 
 # WorldReader
 WorldReader/
+/AssetDecompression/index-linux
+/AssetDecompression/index-macos
+/AssetDecompression/index-win.exe
+/AssetDecompression/package-lock.json

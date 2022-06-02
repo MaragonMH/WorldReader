@@ -64,7 +64,29 @@
                 </MenuItem>
             </Menu>
             <Separator/>
-            <Button Click="Edit">Edits</Button>
+            <Menu>
+                <MenuItem Name="RandomizeHeader" Header="Randomize Items">
+                    <StackPanel Orientation="Horizontal">
+                        <Label MinWidth="150" Content="Seed: "/>
+                        <TextBox Name="RandomizeSeed" Height="auto" Width="auto" VerticalContentAlignment="Center" MinWidth="200"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label MinWidth="150" Content="Item Selector: "/>
+                        <ComboBox Name="RandomizeItemSelector" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your item --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateItemSelectorRandomize">
+                            <!--Fill dynamically in Randomizer-->
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label MinWidth="150" Content="Item Designator: "/>
+                        <ComboBox Name="RandomizeItemDesignator" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your item place --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateItemDesignatorRandomize">
+                            <ComboBoxItem Name="RandomizeItemDesignatorItemEmpty" Content="None"/>
+                            <!--Fill dynamically in Randomizer-->
+                        </ComboBox>
+                    </StackPanel>
+                    <Button Click="RandomizeItems">Start Randomization</Button>
+                </MenuItem>
+            </Menu>
+            <Separator/>
         </ToolBar>
 
         <Grid DockPanel.Dock="Left" Width="Auto" Background="AliceBlue">

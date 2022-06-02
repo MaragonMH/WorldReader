@@ -26,6 +26,7 @@ namespace WorldReader
     {
 		private WorldDatastructur worldDatastructur = null;
 		private WorldManager worldManager = null;
+		private Randomizer randomizer = null;
 		public bool disableEventHandler = false;
 
 		public class MenuItem
@@ -51,6 +52,7 @@ namespace WorldReader
 			this.worldManager = null;
         }
 
+		// TOOLBAR
 		private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			try
@@ -82,10 +84,8 @@ namespace WorldReader
 				MessageBox.Show("Error while reading file: " + ex.Message, "File Error", MessageBoxButton.OK, MessageBoxImage.Warning);
 			}
 
-			if(this.worldManager != null)
-            {
-				this.worldManager.renderMap();
-            }
+			this.randomizer = new Randomizer(this, this.worldDatastructur);
+			this.worldManager?.renderMap();
 		}
 
 		private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -145,10 +145,28 @@ namespace WorldReader
 			tt.Y = 0;
 		}
 
-		private void Edit(object sender, RoutedEventArgs e)
+		private void RandomizeItems(object sender, RoutedEventArgs e)
         {
-			worldManager?.showObjectGroups();
+			string seed = this.RandomizeSeed.Text;
+			this.randomizer.startRandomizer(seed);
+			this.worldManager.renderMap();
         }
+
+		private void UpdateItemDesignatorRandomize(object sender, RoutedEventArgs e)
+        {
+			int itemSelectorIndex = this.RandomizeItemSelector.SelectedIndex;
+			int itemDesignatorIndex = this.RandomizeItemDesignator.SelectedIndex;
+			this.randomizer.configureRandomizer(itemSelectorIndex, itemDesignatorIndex);
+        }
+
+		private void UpdateItemSelectorRandomize(object sender, RoutedEventArgs e)
+        {
+			this.disableEventHandler = true;
+			int itemSelectorIndex = this.RandomizeItemSelector.SelectedIndex;
+			int itemDesignatorIndex = this.randomizer.getConfigureRandomizer(itemSelectorIndex);
+			this.RandomizeItemDesignator.SelectedIndex = itemDesignatorIndex + 1;
+			this.disableEventHandler = false;
+		}
 
         // ZOOM CANVAS
         private Double zoomMax = 2;
