@@ -1,0 +1,29 @@
+GENERAL:
+This is the prototyp of the AV2 patcher for modding purposes.
+Currently it contains only windows script files and the patching files.
+It shouldn't be too difficult to adopt the scripts to other OS's.
+
+PREREQUISITES:
+-git https://git-scm.com/downloads
+-dotnet/MSBuild https://dotnet.microsoft.com/download
+-ilspycmd https://github.com/icsharpcode/ILSpy/tree/master/ICSharpCode.Decompiler.Console
+
+INSTRUCTIONS:
+Make sure that you installed the latest versions and added it to the path.
+Make sure that this folder is directly in the AV2 folder.
+Drop the *.patch files into this folder and execute the patchGame.bat.
+Start the AV2 in the root folder.
+If you add/remove a *.patch file you need to execute the patchGame.bat again.
+If you want to undo all of it execute the restoreGame.bat.
+
+ADVANCED:
+Behind the scenes we are decompiling the AV2.exe changing some code and recompiling it again.
+The patches are applied to a git repository with the decompiled source, which is located in the temp folder.
+The backup of the original AV2.exe is in the backup.
+In the default git configuration there are two tags for the unmodified source and the compileable source.
+The patches are applied consecutively ontop of the master/Start.
+If you want to create a Mod it is recommended to create a new branch with the name of the mod.
+To improve the experience there are two scripts.
+createPatch.bat creates a new patchfile from the difference between the current HEAD and the master/Start and names it accordingly to the branch.
+refinePatch.bat switches to the master/Start and patches the source with the specified file from this folder.
+Furthermore it creates a new branch with the respective name.

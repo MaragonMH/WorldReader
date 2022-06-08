@@ -60,52 +60,6 @@ namespace WorldReader
             }
         }
 
-        public enum SeedRepresentation
-        {
-            ItemIceaxe = 0,
-            ApocalypseAmashilama,
-            ItemGishru,
-            ApocalypseSheshkala,
-            ApocalypseLiru,
-            ApocalypseGudAnna,
-            ApocalypseMushhus,
-            ApocalypseUman,
-            ItemBronzeAxe,
-            ApocalypseNinhursag,
-            ItemCarnelianRing,
-            ApocalypseEskiri,
-            ItemDoubleaxe,
-            ApocalypseUsanRah,
-            ApocalypseDun,
-            ApocalypseImdugBir,
-            ItemUdusan,
-            ApocalypseAnuman,
-            ItemRoyalBracelet,
-            ApocalypseKi,
-            ApocalypseBarash,
-            ItemCopperDagger,
-            ApocalypseHalam,
-            ItemBreachAttractor,
-            ItemHalusan,
-            ItemAnGishru,
-            ItemUlGishru,
-            ApocalypseTilhar,
-            ItemSickleSword,
-            ApocalypseZaltu,
-            ItemRoyalRing,
-            ApocalypseRah,
-            ItemCompass,
-            ItemCompassGem,
-            ItemEyeRing,
-            ItemNanolattice1,
-            ItemNanolattice2,
-            ItemNanolattice3,
-            ItemPowerMatrix1,
-            ItemPowerMatrix2,
-            ItemPowerMatrix3,
-            ItemPowerMatrix4,
-        }
-
         // The following list mentions the object count in the game and corrects it if objects are not loaded by a seperate item or multiple objects.
         private int armCount = 18 + 1; // Game has 18 urns // Dun has two seperate Objects
         private int itemCount = 25 - 1; // Game has 25 items // Flashlight is given from the start 
@@ -121,7 +75,8 @@ namespace WorldReader
         private MainWindow parent = null;
         private WorldDatastructur worldDatastructur = null;
         private string seed = string.Empty;
-        private List<MapObjectPosition> mapObjectPositions = null; 
+        private List<MapObjectPosition> mapObjectPositions = null;
+
 
         public Randomizer(MainWindow parent, WorldDatastructur worldDatastructur)
         {
