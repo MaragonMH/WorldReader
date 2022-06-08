@@ -69,6 +69,15 @@ This app grants you the ability to change the selected
 - Tile Map (Outside, Inside, Breach), 
 - Render Layer (PrePreFG, PreFG, PreFGWater, FG, BG, BGProps, BG, BGWater) and
 - Object Group (ApocalypseUrn, Boss, BreachPortal, Damageable, DamageTrigger, ExteriorDoor, ForceField, Generic, GlitchableTile,  GenericRegion, Item, Lattice, NPC, ParticleObject, Room, RoomAction, RoomTransition, PasscodeAction, SavePoint, SecretWorld, SecretWorldEntrance, SecretWorldItem, TileNPC, TriggerRegion, UdugDoor).
+
+### Randomize Items
+Added in version 1.2. This allows you to randomize all items in the World file.
+These exclude the 9 apocalypse flasks m from the bosses and the health node inside the refill station.
+One note and one apocalypse urn occur twice.
+You can set each individual item to the place of another. To do that, open the Randomize menu in the toolbar, select a item and assign another one.
+Continue until you set all your item.
+After that you can take the decision to enter a seed and randomize all unset items as well.
+If you don't want to randomize the other items just leave the seed field empty.
   
 ### Create Map Object
 Comming soon. Hopefully
