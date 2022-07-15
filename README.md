@@ -3,7 +3,7 @@ Axiom Verge 2 World Reader to create modificated game files.
 ![Screenshot (124)](https://user-images.githubusercontent.com/51925459/171414361-7bc54cb9-4be9-41f4-befe-5d481005ffe6.png)
 
 ## Installation
-- Download [.net 6.0](https://dotnet.microsoft.com/en-us/download)
+- Download [.NET 6.0 Runtime](https://dotnet.microsoft.com/en-us/download)
 - Download this app from the [release](https://github.com/MaragonMH/WorldReader/releases) section
 
 ## Usage
