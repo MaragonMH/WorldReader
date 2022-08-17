@@ -145,6 +145,11 @@ namespace WorldReader
 			tt.Y = 0;
 		}
 
+		private void PrintMap(object sender, RoutedEventArgs e)
+        {
+			this.worldManager.printMap("OutputWorldImage.png");
+		}
+
 		private void RandomizeItems(object sender, RoutedEventArgs e)
         {
 			string seed = this.RandomizeSeed.Text;

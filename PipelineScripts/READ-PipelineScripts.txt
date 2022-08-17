@@ -4,16 +4,20 @@ Currently it contains only windows script files and the patching files.
 It shouldn't be too difficult to adopt the scripts to other OS's.
 
 PREREQUISITES:
+Make sure to check the "Add to path" checkbox if there is one:
 -git https://git-scm.com/downloads
--dotnet/MSBuild https://dotnet.microsoft.com/download
--ilspycmd https://github.com/icsharpcode/ILSpy/tree/master/ICSharpCode.Decompiler.Console
+-dotnet https://dotnet.microsoft.com/en-us/download/dotnet-framework/thank-you/net481-developer-pack-offline-installer
+Should be installed:
+-ilspycmd Automatically installed if dotnet is installed
+-tar Included in the current version of Windows 10 and newer
 
 INSTRUCTIONS:
 Make sure that you installed the latest versions and added it to the path.
-Make sure that this folder is directly in the AV2 folder.
-Drop the *.patch files into this folder and execute the patchGame.bat.
-Start the AV2 in the root folder.
-If you add/remove a *.patch file you need to execute the patchGame.bat again.
+Copy this folder directly in the AV2 folder if your game location is admin restricted chose a different location. You need to copy all your game files to do so (For example to the Desktop).
+Open the "Mods" folder
+Execute intitialize.bat. You need to do this step only once
+Drop the *.patch files into the "Mods" folder.
+If you add/remove a *.patch file you need to execute the patchGame.bat to add it to your game.
 If you want to undo all of it execute the restoreGame.bat.
 
 ADVANCED:

@@ -85,6 +85,7 @@
                     </StackPanel>
                     <Button Click="RandomizeItems">Start Randomization</Button>
                 </MenuItem>
+                <Button Click="PrintMap">PrintMap</Button>
             </Menu>
             <Separator/>
         </ToolBar>

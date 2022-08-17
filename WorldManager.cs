@@ -593,6 +593,12 @@ namespace WorldReader
             }
         }
 
+        // UTIL
+        public void printMap(string filename)
+        {
+            tileMap.SaveWorldImage(filename);
+        }
+
         // HELPER
         private string getCurrentTileMapGroup()
         {

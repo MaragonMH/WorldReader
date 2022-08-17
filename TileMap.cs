@@ -103,6 +103,23 @@ namespace WorldReader
             }
         }
 
+        public void SaveWorldImage(string filename)
+        {
+            SaveImage(filename, worldImage);
+        }
+        private void SaveImage(string filename, BitmapSource image5)
+        {
+            if (filename != string.Empty)
+            {
+                using (FileStream stream5 = new FileStream(filename, FileMode.Create))
+                {
+                    PngBitmapEncoder encoder5 = new PngBitmapEncoder();
+                    encoder5.Frames.Add(BitmapFrame.Create(image5));
+                    encoder5.Save(stream5);
+                }
+            }
+        }
+
         private byte[] BitmapSourceToArray(BitmapSource bitmapSource, Int32Rect rect)
         {
             // Stride = (width) x (bytes per pixel)
