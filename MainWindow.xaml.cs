@@ -16,6 +16,7 @@ using System.IO;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Text.Json;
 
 namespace WorldReader
 {
@@ -93,12 +94,23 @@ namespace WorldReader
 			try
             {
 				SaveFileDialog dlg = new SaveFileDialog();
-				dlg.Filter = "Axiom Verge 2 World File (*.xnb)|*.xnb|All files (*.*)|*.*";
+				dlg.Filter = "Axiom Verge 2 World File (*.xnb)|*.xnb|JSON|*.json|All files (*.*)|*.*";
 				if (dlg.ShowDialog() == true)
 				{
-					using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(dlg.FileName, FileMode.Create, FileAccess.Write)))
+					if (dlg.FileName.EndsWith(".xnb"))
 					{
-						this.worldDatastructur.Write(binaryWriter);
+						using (BinaryWriter binaryWriter = new BinaryWriter(File.Open(dlg.FileName, FileMode.Create, FileAccess.Write)))
+						{
+							this.worldDatastructur.Write(binaryWriter);
+						}
+					}
+					else if (dlg.FileName.EndsWith(".json"))
+					{
+						File.WriteAllText(dlg.FileName, JsonSerializer.Serialize(this.worldDatastructur, new JsonSerializerOptions
+						{
+							PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+							WriteIndented = true
+						}));
 					}
 				}
             }

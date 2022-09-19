@@ -4,33 +4,42 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WorldReader
 {
-    public class WorldDatastructur
+	public class WorldDatastructur
     {
-        // File Header
-        private byte[] fileHeader = null;
+		// File Header
+		private byte[] fileHeader = null;
 
-        // General File Information
-        private string WorldName;
-        public Int32 WidthTiles;
-        public Int32 HeightTiles;
-        private Int32 TileSetWidth;
-        private Int32 TileSetHeight;
+		// General File Information
+		[JsonInclude]
+		public string WorldName;
+		[JsonInclude]
+		public Int32 WidthTiles;
+		[JsonInclude]
+		public Int32 HeightTiles;
+		[JsonInclude]
+		public Int32 TileSetWidth;
+		[JsonInclude]
+		public Int32 TileSetHeight;
+		[JsonInclude]
+		public Dictionary<string, TileMapGroup> tileMapGroups = null;
 
-        public Dictionary<string, TileMapGroup> tileMapGroups = null;
-
-        public class TileMapGroup
+		public class TileMapGroup
         {
-
-            public List<Tile> tiles = null;
-            public List<MapObject> mapObjects = null;
-            // Non visible Information
-            public List<Properties> properties = null;
-            public List<LineSegment> lineSegments = null;
+			[JsonInclude]
+			public List<Tile> tiles = null;
+			[JsonInclude]
+			public List<MapObject> mapObjects = null;
+			// Non visible Information
+			[JsonInclude]
+			public List<Properties> properties = null;
+			[JsonInclude]
+			public List<LineSegment> lineSegments = null;
 
             public enum MapObjectGroupType
             {
@@ -81,21 +90,25 @@ namespace WorldReader
                 this.lineSegments = null;
             }
 
-            public class Tile
+			public class Tile
             {
-                public Int32 PropertyIndex2 = Int32.MaxValue;
+				[JsonInclude]
+				public Int32 PropertyIndex2 = Int32.MaxValue;
 
+                [JsonIgnore]
                 public bool IsPropertyIndex2Set
                 {
                     get { return PropertyIndex2 != Int32.MaxValue; }
                     private set { }
                 }
 
-                public CollisionTile collisionTile = null;
+				[JsonInclude]
+				public CollisionTile collisionTile = null;
 
-                public AppearanceTile appearanceTile = null;
+				[JsonInclude]
+				public AppearanceTile appearanceTile = null;
 
-                public class CollisionTile
+				public class CollisionTile
                 {
                     [Flags]
                     public enum TileFlags : uint
@@ -132,16 +145,19 @@ namespace WorldReader
                         Invalid
                     }
 
-                    public UInt32 CollisionFlag;
-                    public Int32 LineSegmentIndex3 = Int32.MaxValue; // uninitialized 
+					[JsonInclude]
+					public UInt32 CollisionFlag;
+					[JsonInclude]
+					public Int32 LineSegmentIndex3 = Int32.MaxValue; // uninitialized 
 
-                    public bool IsLineSegmentIndex3Set { 
+					[JsonIgnore]
+					public bool IsLineSegmentIndex3Set { 
                         get { return LineSegmentIndex3 != Int32.MaxValue; }
                         private set { }
                     }
                 }
 
-                public class AppearanceTile
+				public class AppearanceTile
                 {
                     public enum RenderLayer {
                         PrePreFG = 1,
@@ -152,7 +168,8 @@ namespace WorldReader
                         BG = 9,
                         BGWater = 10
                     }
-                    public Dictionary<RenderLayer, UInt32> TileAppearanceIndex = null;
+					[JsonInclude]
+					public Dictionary<RenderLayer, UInt32> TileAppearanceIndex = null;
 
                     public AppearanceTile()
                     {
@@ -179,21 +196,34 @@ namespace WorldReader
                 }
             }
 
-            public class MapObject
+			public class MapObject
             {
-                public string mapObjectGroupName;
-                public MapObjectGroupType mapObjectGroupType;
-                public string name;
-                public UInt32 id;
-                public Single boundsPixelX;
-                public Single boundsPixelY;
-                public Single boundsPixelWidth;
-                public Single boundsPixelHeight;
-                public bool flipH;
-                public bool flipV;
-                public Single rotation;
-                public List<Tuple<Single,Single>> vertices = null;
-                public Dictionary<string, string> valuePairs = null;
+				[JsonInclude]
+				public string mapObjectGroupName;
+				[JsonInclude]
+				public MapObjectGroupType mapObjectGroupType;
+				[JsonInclude]
+				public string name;
+				[JsonInclude]
+				public UInt32 id;
+				[JsonInclude]
+				public Single boundsPixelX;
+				[JsonInclude]
+				public Single boundsPixelY;
+				[JsonInclude]
+				public Single boundsPixelWidth;
+				[JsonInclude]
+				public Single boundsPixelHeight;
+				[JsonInclude]
+				public bool flipH;
+				[JsonInclude]
+				public bool flipV;
+				[JsonInclude]
+				public Single rotation;
+				[JsonInclude]
+				public List<Tuple<Single,Single>> vertices = null;
+				[JsonInclude]
+				public Dictionary<string, string> valuePairs = null;
 
                 public MapObject()
                 {
@@ -222,7 +252,7 @@ namespace WorldReader
                 public void PropertiesFromString(string propertiesText)
                 {
                     valuePairs.Clear();
-                    if (propertiesText == "None") return;
+                    if (propertiesText == "None" || propertiesText == null) return;
                     string[] propertyTextList = propertiesText.Split("\n");
                     foreach (string line in propertyTextList)
                     {
@@ -264,11 +294,12 @@ namespace WorldReader
                 }
             }
 
-            public class Properties
+			public class Properties
             {
-                
-                public MapObjectGroupType mapObjectGroupType;
-                public Dictionary<string, string> valuePairs = null;
+				[JsonInclude]
+				public MapObjectGroupType mapObjectGroupType;
+				[JsonInclude]
+				public Dictionary<string, string> valuePairs = null;
                 public Properties()
                 {
                     this.valuePairs = new Dictionary<string, string>();
@@ -291,10 +322,13 @@ namespace WorldReader
                 }
             }
 
-            public class LineSegment
+			public class LineSegment
             {
-                public Tuple<Single, Single> point1 = null;
-                public Tuple<Single, Single> point2 = null;
+				[JsonInclude]
+				public Tuple<Single, Single> point1 = null;
+				[JsonInclude]
+				public Tuple<Single, Single> point2 = null;
+                public LineSegment() { }
                 public LineSegment(Single p1x, Single p1y, Single p2x, Single p2y)
                 {
                     this.point1 = new Tuple<Single, Single>(p1x, p1y);
@@ -317,8 +351,11 @@ namespace WorldReader
         }
 
 
+        public WorldDatastructur()
+        { }
+
         public WorldDatastructur(BinaryReader reader)
-        {
+        { 
             this.tileMapGroups = new Dictionary<string, TileMapGroup>();
 
             // FileHeader

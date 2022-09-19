@@ -232,7 +232,7 @@
                     
                     <StackPanel Orientation="Horizontal">
                         <Label MinWidth="150" Content="Properties: "/>
-                        <ComboBox Name="MapObjectProperties" Height="auto" Width="auto" IsEditable="True" IsReadOnly="True" Text="-- Choose your object properties set --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateMapObject">
+                        <ComboBox Name="MapObjectProperties" Height="auto" Width="auto" IsEditable="True" Text="-- Choose your object properties set --" MinWidth="300" SelectedValuePath="Content" SelectionChanged="UpdateMapObject" TextBoxBase.TextChanged="UpdateMapObject">
                             <ComboBoxItem Name="MapObjectPropertiesItemEmpty" Content="None"/>
                             <!--Fill dynamically in WorldManager-->
                         </ComboBox>

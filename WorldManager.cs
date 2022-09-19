@@ -181,6 +181,9 @@ namespace WorldReader
         private void selectObject(object sender, MouseButtonEventArgs e)
         {
             if (!loaded) return;
+            // This may lead to crashes if you open the object menu
+            buildGroupSpecificComponents();
+
             parent.disableEventHandler = true;
 
             // Maybe there is some confliction potential here if the objects are overlapping and this is called multiple times
@@ -278,7 +281,7 @@ namespace WorldReader
             mapObject.mapObjectGroupType = (WorldDatastructur.TileMapGroup.MapObjectGroupType)Enum.Parse(typeof(WorldDatastructur.TileMapGroup.MapObjectGroupType), parent.MapObjectGroupType.SelectedValue.ToString());
 
             // Write properties
-            mapObject.PropertiesFromString(parent.MapObjectProperties.SelectedValue.ToString());
+            mapObject.PropertiesFromString(parent.MapObjectProperties.Text?.ToString());
 
             // Write vertices
             mapObject.VerticesFromString(parent.MapObjectVertices.SelectedValue.ToString());
@@ -301,7 +304,7 @@ namespace WorldReader
             ((RotateTransform)displayedObject.LayoutTransform).Angle = mapObject.rotation;
 
             parent.disableEventHandler = false;
-        }
+		}
 
         // Attached to mapObjectHeaderGroupsCheckBoxes
         private void changeObjectVisibility(object sender, RoutedEventArgs e)
